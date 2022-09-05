@@ -1,5 +1,7 @@
 package ru.yandex.practicum.tasks;
 
+import java.util.Objects;
+
 public class Subtask extends Task {
 
     private int subtaskId;
@@ -26,6 +28,38 @@ public class Subtask extends Task {
         this.epicId = epicId;
     }
 
+    public String getTaskName() {
+        return super.getTaskName();
+    }
+
+    public void setTaskName(String taskName) {
+        super.setTaskName(taskName);
+    }
+
+    public String getTaskDescription() {
+        return super.getTaskDescription();
+    }
+
+    public void setTaskDescription(String taskDescription) {
+        super.setTaskDescription(taskDescription);
+    }
+
+    public int getTaskId() {
+        return super.getTaskId();
+    }
+
+    public void setTaskId(int taskId) {
+        super.setTaskId(taskId);
+    }
+
+    public String getTaskStatus() {
+        return super.getTaskStatus();
+    }
+
+    public void setTaskStatus(String taskStatus) {
+        super.setTaskStatus(taskStatus);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -35,4 +69,16 @@ public class Subtask extends Task {
         return subtaskId == subtask.subtaskId && epicId == subtask.epicId;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(subtaskId, epicId);
+    }
+
+    @Override
+    public String toString() {
+        return "Subtask{" +
+                "subtaskId=" + subtaskId +
+                ", epicId=" + epicId +
+                "} " + super.toString();
+    }
 }

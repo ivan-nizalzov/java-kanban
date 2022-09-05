@@ -1,5 +1,7 @@
 package ru.yandex.practicum.tasks;
 
+import java.util.Objects;
+
 public class Task {
 
     private String taskName; //Наименование задачи
@@ -46,15 +48,6 @@ public class Task {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Task)) return false;
-        Task task = (Task) o;
-        return taskId == task.taskId && taskName.equals(task.taskName)
-                && taskDescription.equals(task.taskDescription) && taskStatus.equals(task.taskStatus);
-    }
-
-    @Override
     public String toString() {
         return "Task{" +
                 "taskName='" + taskName + '\'' +
@@ -62,5 +55,19 @@ public class Task {
                 ", taskStatus='" + taskStatus + '\'' +
                 ", taskId=" + taskId +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Task)) return false;
+        Task task = (Task) o;
+        return taskId == task.taskId && taskName.equals(task.taskName) && taskDescription.equals(task.taskDescription)
+                && taskStatus.equals(task.taskStatus);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(taskName, taskDescription, taskStatus, taskId);
     }
 }

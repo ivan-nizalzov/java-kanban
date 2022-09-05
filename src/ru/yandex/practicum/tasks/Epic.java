@@ -16,6 +16,38 @@ public class Epic extends Task {
         subtaskIds = new ArrayList<>();
     }
 
+    public String getTaskName() {
+        return super.getTaskName();
+    }
+
+    public void setTaskName(String taskName) {
+        super.setTaskName(taskName);
+    }
+
+    public String getTaskDescription() {
+        return super.getTaskDescription();
+    }
+
+    public void setTaskDescription(String taskDescription) {
+        super.setTaskDescription(taskDescription);
+    }
+
+    public int getTaskId() {
+        return super.getTaskId();
+    }
+
+    public void setTaskId(int taskId) {
+        super.setTaskId(taskId);
+    }
+
+    public String getTaskStatus() {
+        return super.getTaskStatus();
+    }
+
+    public void setTaskStatus(String taskStatus) {
+        super.setTaskStatus(taskStatus);
+    }
+
     public int getEpicId() {
         return epicId;
     }
@@ -38,7 +70,19 @@ public class Epic extends Task {
         if (!(o instanceof Epic)) return false;
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
-        return epicId == epic.epicId && Objects.equals(subtaskIds, epic.subtaskIds);
+        return epicId == epic.epicId && subtaskIds.equals(epic.subtaskIds);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(epicId, subtaskIds);
+    }
+
+    @Override
+    public String toString() {
+        return "Epic{" +
+                "epicId=" + epicId +
+                ", subtaskIds=" + subtaskIds +
+                "} " + super.toString();
+    }
 }
