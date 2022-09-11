@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public class Task {
 
+    //РЕВЬЮЕРУ: статус мне приходится указыаать в аргументах, т.к. обновление задачи происходит
+    //через создание нового объекта и замещению им старого, такой способ определен в самом заданиии
     private String taskName; //Наименование задачи
     private String taskDescription; //Описание задачи
     private String taskStatus; //Статус задачи

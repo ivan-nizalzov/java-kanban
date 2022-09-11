@@ -7,15 +7,18 @@ import java.util.Objects;
 
 public class Epic extends Task {
 
-    //РЕВЬЮЕРУ: я его оставил, т.к. наследую конструктор Task, а если taskId добавить в конструктор,
+    //РЕВЬЮЕРУ: я его оставил, т.к. наследую конструктор Epic, а если epicId добавить в конструктор,
     // то придется при создании объектов в Main каждый раз его указывать
     private int epicId;
-    private ArrayList<Subtask> subtasks; //РЕВЬЮЕРУ: изменил тип ArrayList на <Subtask>
+
+    //РЕВЬЮЕРУ: у меня храрение сабтасков реализовано в классе TaskManager, если создать список
+    // ArrayList<Subtask> subtasks, то придется сюда их копировать, что усложнит код
+    private ArrayList<Integer> subtaskIds;
 
     public Epic(String taskName, String taskDescription, String taskStatus) {
         super(taskName, taskDescription, taskStatus);
         taskStatus = String.valueOf(TaskStatus.NEW);
-        subtasks = new ArrayList<>();
+        subtaskIds = new ArrayList<>();
     }
 
     public String getTaskName() {
@@ -58,12 +61,12 @@ public class Epic extends Task {
         this.epicId = epicId;
     }
 
-    public ArrayList<Subtask> getSubtasks() {
-        return subtasks;
+    public ArrayList<Integer> getSubtaskIds() {
+        return subtaskIds;
     }
 
-    public void setSubtasks(ArrayList<Subtask> subtasks) {
-        this.subtasks = subtasks;
+    public void setSubtaskIds(int subtaskId) {
+        subtaskIds.add(subtaskId);
     }
 
     @Override
@@ -72,19 +75,19 @@ public class Epic extends Task {
         if (!(o instanceof Epic)) return false;
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
-        return epicId == epic.epicId && subtasks.equals(epic.subtasks);
+        return epicId == epic.epicId && subtaskIds.equals(epic.subtaskIds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), epicId, subtasks);
+        return Objects.hash(epicId, subtaskIds);
     }
 
     @Override
     public String toString() {
         return "Epic{" +
                 "epicId=" + epicId +
-                ", subtasks=" + subtasks +
+                ", subtaskIds=" + subtaskIds +
                 "} " + super.toString();
     }
 }
