@@ -7,13 +7,15 @@ import java.util.Objects;
 
 public class Epic extends Task {
 
+    //РЕВЬЮЕРУ: я его оставил, т.к. наследую конструктор Task, а если taskId добавить в конструктор,
+    // то придется при создании объектов в Main каждый раз его указывать
     private int epicId;
-    private ArrayList<Integer> subtaskIds;
+    private ArrayList<Subtask> subtasks; //РЕВЬЮЕРУ: изменил тип ArrayList на <Subtask>
 
     public Epic(String taskName, String taskDescription, String taskStatus) {
         super(taskName, taskDescription, taskStatus);
         taskStatus = String.valueOf(TaskStatus.NEW);
-        subtaskIds = new ArrayList<>();
+        subtasks = new ArrayList<>();
     }
 
     public String getTaskName() {
@@ -56,12 +58,12 @@ public class Epic extends Task {
         this.epicId = epicId;
     }
 
-    public ArrayList<Integer> getSubtaskIds() {
-        return subtaskIds;
+    public ArrayList<Subtask> getSubtasks() {
+        return subtasks;
     }
 
-    public void setSubtaskIds(int subtaskId) {
-        subtaskIds.add(subtaskId);
+    public void setSubtasks(ArrayList<Subtask> subtasks) {
+        this.subtasks = subtasks;
     }
 
     @Override
@@ -70,19 +72,19 @@ public class Epic extends Task {
         if (!(o instanceof Epic)) return false;
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
-        return epicId == epic.epicId && subtaskIds.equals(epic.subtaskIds);
+        return epicId == epic.epicId && subtasks.equals(epic.subtasks);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(epicId, subtaskIds);
+        return Objects.hash(super.hashCode(), epicId, subtasks);
     }
 
     @Override
     public String toString() {
         return "Epic{" +
                 "epicId=" + epicId +
-                ", subtaskIds=" + subtaskIds +
+                ", subtasks=" + subtasks +
                 "} " + super.toString();
     }
 }

@@ -15,8 +15,8 @@ public class TaskManager {
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
-    Epic epic;
-    Subtask subtask;
+    Epic epic; //РЕВЬЮЕРУ: epic используется - см. строки 94, 118
+    Subtask subtask; //РЕВЬЮЕРУ: subtask тоже используется - см. строку 93
 
     public HashMap<Integer, Epic> getEpics() {
         return epics;
@@ -140,7 +140,7 @@ public class TaskManager {
     //=================================================
 
     //Обновление статуса эпика
-    public void updateStatusOfEpic(Epic epic) {
+    private void updateStatusOfEpic(Epic epic) {
         int countNew = 0;
         int countDone = 0;
 

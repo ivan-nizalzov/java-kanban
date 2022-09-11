@@ -4,6 +4,9 @@ import java.util.Objects;
 
 public class Subtask extends Task {
 
+
+    //РЕВЬЮЕРУ: аналогично Epic: я его оставил, т.к. наследую конструктор Task, а если taskId добавить в конструктор,
+    // то придется при создании объектов в Main каждый раз его указывать
     private int subtaskId;
     private int epicId;
 
