@@ -1,20 +1,20 @@
 package ru.yandex.practicum.tasks;
 
+import ru.yandex.practicum.manager.TaskStatus;
 import java.util.Objects;
 
 public class Task {
 
-    //РЕВЬЮЕРУ: статус мне приходится указыаать в аргументах, т.к. обновление задачи происходит
-    //через создание нового объекта и замещению им старого, такой способ определен в самом заданиии
     private String taskName; //Наименование задачи
     private String taskDescription; //Описание задачи
-    private String taskStatus; //Статус задачи
-    private int taskId; //Уникальный идентификационный номер задачи
+    TaskStatus taskStatus; //Статус задачи
+    private int id; //Уникальный идентификационный номер задачи
 
-    public Task(String taskName, String taskDescription, String taskStatus) {
+    public Task(String taskName, String taskDescription, TaskStatus taskStatus, int id) {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskStatus = taskStatus;
+        this.id = id;
     }
 
     public String getTaskName() {
@@ -33,30 +33,20 @@ public class Task {
         this.taskDescription = taskDescription;
     }
 
-    public int getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
-    }
-
-    public String getTaskStatus() {
+    public TaskStatus getTaskStatus() {
         return taskStatus;
     }
 
-    public void setTaskStatus(String taskStatus) {
+    public void setTaskStatus(TaskStatus taskStatus) {
         this.taskStatus = taskStatus;
     }
 
-    @Override
-    public String toString() {
-        return "Task{" +
-                "taskName='" + taskName + '\'' +
-                ", taskDescription='" + taskDescription + '\'' +
-                ", taskStatus='" + taskStatus + '\'' +
-                ", taskId=" + taskId +
-                '}';
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
@@ -64,12 +54,22 @@ public class Task {
         if (this == o) return true;
         if (!(o instanceof Task)) return false;
         Task task = (Task) o;
-        return taskId == task.taskId && taskName.equals(task.taskName) && taskDescription.equals(task.taskDescription)
+        return id == task.id && taskName.equals(task.taskName) && taskDescription.equals(task.taskDescription)
                 && taskStatus.equals(task.taskStatus);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(taskName, taskDescription, taskStatus, taskId);
+        return Objects.hash(taskName, taskDescription, taskStatus, id);
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "taskName='" + taskName + '\'' +
+                ", taskDescription='" + taskDescription + '\'' +
+                ", taskStatus=" + taskStatus +
+                ", id=" + id +
+                '}';
     }
 }
