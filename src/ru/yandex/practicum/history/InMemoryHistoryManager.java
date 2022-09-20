@@ -1,18 +1,22 @@
 package ru.yandex.practicum.history;
 
 import ru.yandex.practicum.tasks.Task;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private final List<Task> history = new ArrayList<>();
+    private final LinkedList<Task> history = new LinkedList<>();
 
+    //РЕВЬЮЕРУ: метод переписал с учетом замечаний (вместо списка ArrayList<>() использовал связанный LinkedList<>())
     @Override
     public void add(Task task) {
         history.add(task);
         if (history.size() > 10) {
-            history.remove(0);
+            history.addFirst(task);
+        } else {
+            history.removeLast();
+            history.addFirst(task);
         }
     }
 
