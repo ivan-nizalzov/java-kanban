@@ -15,7 +15,6 @@ public class InMemoryTaskManager implements TaskManager {
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
-    //Почему так?? Мне ннепонятно, зачем выносить создание объекта в утилитарный класс Managers
     HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
@@ -131,16 +130,19 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeEpicById(int id) {
         epics.remove(id);
+        historyManager.remove(id);
     }
 
     @Override
     public void removeTaskById(int id) {
         tasks.remove(id);
+        historyManager.remove(id);
     }
 
     @Override
     public void removeSubtaskById(int id, Epic epic) {
         subtasks.remove(id);
+        historyManager.remove(id);
         updateStatusOfEpic(epic);
     }
     //=================================================

@@ -1,27 +1,81 @@
 package ru.yandex.practicum.history;
 
 import ru.yandex.practicum.tasks.Task;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private final LinkedList<Task> history = new LinkedList<>();
+    private Node<Task> head;
+    private Node<Task> tail;
+    private Node<Task> oldTail;
+    private int sizeOfCustomLinkedList = 0;
+    private final HashMap<Integer, Node> history = new HashMap<>();
 
-    //РЕВЬЮЕРУ: метод переписал с учетом замечаний (вместо списка ArrayList<>() использовал связанный LinkedList<>())
     @Override
     public void add(Task task) {
-        history.add(task);
-        if (history.size() < 10) {
-            history.addFirst(task);
-        } else {
-            history.removeLast();
-            history.addFirst(task);
+        Node<Task> node = linkLast(task);
+        if (task == null) {
+            return;
+        } else if (history.containsKey(task.getId())) {
+            removeNode(history.get(task.getId()));
         }
+        history.put(task.getId(), node);
+    }
+
+    @Override
+    public void remove(int id) {
+        history.remove(id);
+        removeNode(history.get(id));
     }
 
     @Override
     public List<Task> getHistory() {
-        return history;
+        return getTasks();
     }
+
+    private ArrayList<Task> getTasks() {
+        ArrayList<Task> arrayListOfTasks = new ArrayList<>();
+        Node<Task> currNode = head;
+        if (currNode == null) {
+            throw new NoSuchElementException();
+        }
+        while (currNode != null) {
+            arrayListOfTasks.add(currNode.data);
+            currNode = currNode.next;
+        }
+        return arrayListOfTasks;
+    }
+
+    private Node<Task> linkLast(Task element) {
+        final Node<Task> newNode = new Node<>(null, element, null);
+
+        if (head == null) {
+            head = newNode;
+            tail = head;
+        } else {
+            oldTail = tail;
+            tail = newNode;
+            oldTail.next = tail;
+            tail.prev = oldTail;
+        }
+        sizeOfCustomLinkedList++;
+        return newNode;
+    }
+
+    private void removeNode(Node<Task> node) {
+        if (node != null) {
+            if (node.next == null) {
+                node.prev.next = null;
+                tail = node.prev;
+            } else if (node.prev == null) {
+                node.next.prev = null;
+                head = node.next;
+            } else {
+                node.prev.next = node.next;
+                node.next.prev = node.prev;
+            }
+        }
+        sizeOfCustomLinkedList--;
+    }
+
 }

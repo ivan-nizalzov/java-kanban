@@ -5,9 +5,6 @@ import ru.yandex.practicum.history.InMemoryHistoryManager;
 
 public class Managers {
 
-    /*Данный метод прописан из-за требований в ТЗ, при этом мне непонятно, для чего он нужен,
-    т.к. он не используется в текущей версии кода
-     */
     public static TaskManager getDefault() {
         return new InMemoryTaskManager();
     }
