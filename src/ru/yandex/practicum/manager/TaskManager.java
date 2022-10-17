@@ -68,11 +68,7 @@ public interface TaskManager {
     public ArrayList<Subtask> getAllSubtasks(int id, Epic epic);
     //=================================================
 
-    //Обновление статуса эпика
-    public void updateStatusOfEpic(Epic epic);
-    //=================================================
-
-    //Метод возвращает последние 10 просмотренных задач
+    //Метод возвращает историю просмотренных задач
     public List<Task> getHistory();
     //=================================================
 }

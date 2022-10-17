@@ -15,7 +15,7 @@ public class InMemoryTaskManager implements TaskManager {
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
-    HistoryManager historyManager = Managers.getDefaultHistory();
+    private HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
     public HashMap<Integer, Epic> getEpics() {
@@ -157,8 +157,7 @@ public class InMemoryTaskManager implements TaskManager {
     //=================================================
 
     //Обновление статуса эпика
-    @Override
-    public void updateStatusOfEpic(Epic epic) {
+    private void updateStatusOfEpic(Epic epic) {
         int countNew = 0;
         int countDone = 0;
 

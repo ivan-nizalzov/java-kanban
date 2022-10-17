@@ -8,7 +8,7 @@ public class Task {
 
     private String taskName; //Наименование задачи
     private String taskDescription; //Описание задачи
-    TaskStatus taskStatus; //Статус задачи
+    public TaskStatus taskStatus; //Статус задачи
     private int id; //Уникальный идентификационный номер задачи
 
     public Task(String taskName, String taskDescription, TaskStatus taskStatus, int id) {
