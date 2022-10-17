@@ -1,7 +1,5 @@
 package ru.yandex.practicum.tasks;
 
-import ru.yandex.practicum.manager.TaskStatus;
-
 import java.util.Objects;
 
 public class Subtask extends Task {

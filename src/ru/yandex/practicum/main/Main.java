@@ -1,7 +1,7 @@
 package ru.yandex.practicum.main;
 
 import ru.yandex.practicum.manager.InMemoryTaskManager;
-import ru.yandex.practicum.manager.TaskStatus;
+import ru.yandex.practicum.tasks.TaskStatus;
 import ru.yandex.practicum.tasks.Epic;
 import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
