@@ -60,7 +60,6 @@ public class Main {
         inMemoryTaskManager.getEpicById(3);
 
         inMemoryTaskManager.getTaskById(1);
-        inMemoryTaskManager.getTaskById(3);
         inMemoryTaskManager.getTaskById(2);
         inMemoryTaskManager.getTaskById(2);
 
@@ -71,7 +70,7 @@ public class Main {
 
         System.out.println(inMemoryTaskManager.getHistory());
 
-        inMemoryTaskManager.removeTaskById(1);
+        inMemoryTaskManager.removeTaskById(2);
         inMemoryTaskManager.removeEpicById(3);
 
         System.out.println(inMemoryTaskManager.getHistory());

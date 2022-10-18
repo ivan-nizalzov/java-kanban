@@ -6,7 +6,7 @@ public class Task {
 
     private String taskName; //Наименование задачи
     private String taskDescription; //Описание задачи
-    public TaskStatus taskStatus; //Статус задачи
+    private TaskStatus taskStatus; //Статус задачи
     private int id; //Уникальный идентификационный номер задачи
 
     public Task(String taskName, String taskDescription, TaskStatus taskStatus, int id) {
@@ -64,11 +64,11 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "taskName='" + taskName + '\'' +
-                ", taskDescription='" + taskDescription + '\'' +
-                ", taskStatus=" + taskStatus +
-                ", id=" + id +
-                '}';
+        return "Task: {" +
+                "taskId=" + getId() +
+                ", taskName=" + getTaskName() +
+                ", taskStatus=" + getTaskStatus() +
+                ", taskDescription= '" + getTaskDescription() + "'}" + "\n";
+
     }
 }

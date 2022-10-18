@@ -6,9 +6,11 @@ import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
 import ru.yandex.practicum.tasks.TaskStatus;
 
+import javax.crypto.spec.PSource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -70,20 +72,32 @@ public class InMemoryTaskManager implements TaskManager {
     //Получение задачи по id для каждой HashMap
     @Override
     public Epic getEpicById(int id) {
-        historyManager.add(epics.get(id));
-        return epics.get(id);
+        if (epics.containsKey(id)) {
+            historyManager.add(epics.get(id));
+            return epics.get(id);
+        } else {
+            throw new NoSuchElementException();
+        }
     }
 
     @Override
     public Task getTaskById(int id) {
-        historyManager.add(tasks.get(id));
-        return tasks.get(id);
+        if (tasks.containsKey(id)) {
+            historyManager.add(tasks.get(id));
+            return tasks.get(id);
+        } else {
+            throw new NoSuchElementException();
+        }
     }
 
     @Override
     public Subtask getSubTaskById(int id) {
-        historyManager.add(subtasks.get(id));
-        return subtasks.get(id);
+        if (subtasks.containsKey(id)) {
+            historyManager.add(subtasks.get(id));
+            return subtasks.get(id);
+        } else {
+            throw new NoSuchElementException();
+        }
     }
     //=================================================
 
@@ -110,17 +124,20 @@ public class InMemoryTaskManager implements TaskManager {
     //Обновление задач
     @Override
     public void updateEpic(Epic epic) {
+        epics.remove(epic.getId());
         epics.put(epic.getId(), epic);
         updateStatusOfEpic(epic);
     }
 
     @Override
     public void updateTask(Task task) {
+        tasks.remove(task.getId());
         tasks.put(task.getId(), task);
     }
 
     @Override
     public void updateSubtask(Subtask subtask, Epic epic) {
+        subtasks.remove(subtask.getId());
         subtasks.put(subtask.getId(), subtask);
         epic.setSubtasks(subtask);
         updateStatusOfEpic(epic);
@@ -131,6 +148,12 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeEpicById(int id) {
         epics.remove(id);
+        for (Subtask subtask : subtasks.values()) {
+            if (subtask.getId() == id) {
+                subtasks.remove(subtask.getId());
+                historyManager.remove(subtask.getId());
+            }
+        }
         historyManager.remove(id);
     }
 

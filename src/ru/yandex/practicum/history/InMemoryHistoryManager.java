@@ -58,7 +58,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             oldTail.next = tail;
             tail.prev = oldTail;
         }
-        sizeOfCustomLinkedList++;
+        ++sizeOfCustomLinkedList;
         return newNode;
     }
 
@@ -75,7 +75,7 @@ public class InMemoryHistoryManager implements HistoryManager {
                 node.next.prev = node.prev;
             }
         }
-        sizeOfCustomLinkedList--;
+        --sizeOfCustomLinkedList;
     }
 
 }
