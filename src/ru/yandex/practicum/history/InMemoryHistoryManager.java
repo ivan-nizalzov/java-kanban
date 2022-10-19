@@ -35,13 +35,13 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private ArrayList<Task> getTasks() {
         ArrayList<Task> arrayListOfTasks = new ArrayList<>();
-        Node<Task> currNode = head;
-        if (currNode == null) {
-            throw new NoSuchElementException();
-        }
-        while (currNode != null) {
-            arrayListOfTasks.add(currNode.data);
-            currNode = currNode.next;
+
+        for (Node<Task> node : history.values()) {
+            if (node == null) {
+                throw new NoSuchElementException();
+            } else {
+                arrayListOfTasks.add(node.data);
+            }
         }
         return arrayListOfTasks;
     }

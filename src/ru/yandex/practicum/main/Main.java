@@ -68,11 +68,13 @@ public class Main {
         inMemoryTaskManager.getSubTaskById(6);
         inMemoryTaskManager.getSubTaskById(7);
 
+        System.out.println();
         System.out.println(inMemoryTaskManager.getHistory());
 
         inMemoryTaskManager.removeTaskById(2);
         inMemoryTaskManager.removeEpicById(3);
 
+        System.out.println();
         System.out.println(inMemoryTaskManager.getHistory());
         //=================================================
 
