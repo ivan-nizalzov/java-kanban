@@ -7,8 +7,8 @@ public class Epic extends Task {
 
     private ArrayList<Subtask> subtasks;
 
-    public Epic(String taskName, String taskDescription, TaskStatus taskStatus, int id) {
-        super(taskName, taskDescription, taskStatus, id);
+    public Epic(int id, TaskType taskType, String epicName, TaskStatus taskStatus, String epicDescription) {
+        super(id, taskType, epicName, taskStatus, epicDescription);
         subtasks = new ArrayList<>();
     }
 
@@ -41,9 +41,10 @@ public class Epic extends Task {
     @Override
     public String toString() {
         return "Epic: {" +
-                "epicId=" + getId() +
-                ", epicName=" + getTaskName() +
-                ", epicStatus=" + getTaskStatus() +
-                ", epicDescription= '" + getTaskDescription() + "'}" + "\n";
+                "taskId=" + getId() +
+                ", taskType=" + getTaskType() +
+                ", taskName=" + getTaskName() +
+                ", taskStatus=" + getTaskStatus() +
+                ", taskDescription= '" + getTaskDescription() + "'}" + System.lineSeparator();
     }
 }

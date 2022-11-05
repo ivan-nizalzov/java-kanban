@@ -1,81 +1,99 @@
 package ru.yandex.practicum.main;
 
+import ru.yandex.practicum.manager.FileBackedTaskManager;
 import ru.yandex.practicum.manager.InMemoryTaskManager;
-import ru.yandex.practicum.tasks.TaskStatus;
-import ru.yandex.practicum.tasks.Epic;
-import ru.yandex.practicum.tasks.Subtask;
-import ru.yandex.practicum.tasks.Task;
+import ru.yandex.practicum.manager.Managers;
+import ru.yandex.practicum.tasks.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import static ru.yandex.practicum.manager.FileBackedTaskManager.PATH;
 
 public class Main {
-
     public static void main(String[] args) {
 
-        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
-        int id = 0;
+        FileBackedTaskManager manager = Managers.getDefaultFileBackedTaskManager();
+
+        if (Files.exists(Paths.get(PATH, "back-up.csv"))) {
+            try {
+                manager.loadFromLife("back-up.csv");
+            } catch (IOException e) {
+                System.out.println("Произошла ошибка при попытке открытия файла!" + "\n" + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            FileBackedTaskManager.createBackUpFile();
+        }
+        int id = InMemoryTaskManager.getIdCounter();
 
         //Добавление задач
-        Task task1 = new Task("Задача #1", "Забрать заказ в аптеке", TaskStatus.NEW,
-                ++id);
-        Task task2 = new Task("Задача #2", "Записаться к барберу", TaskStatus.IN_PROGRESS, ++id);
+        Task task1 = new Task(++id, TaskType.TASK, "Задача #1", TaskStatus.NEW,
+                "Забрать заказ в аптеке");
+        Task task2 = new Task(++id, TaskType.TASK, "Задача #2", TaskStatus.IN_PROGRESS,
+                "Записаться к барберу");
 
-        inMemoryTaskManager.addTask(task1);
-        inMemoryTaskManager.addTask(task2);
+        manager.addTask(task1);
+        manager.addTask(task2);
         //=================================================
 
         //Добавление эпиков
-        Epic epic1 = new Epic("Эпик #1", "Выполнить финалку 5-го спринта", TaskStatus.NEW,
-                ++id);
-        Epic epic2 = new Epic("Эпик #2", "Отремонтировать машину", TaskStatus.NEW, ++id);
+        Epic epic1 = new Epic(++id, TaskType.EPIC, "Эпик №1", TaskStatus.NEW,
+                "Выполнить финалку 6-го спринта");
+        Epic epic2 = new Epic(++id, TaskType.EPIC, "Эпик №2", TaskStatus.NEW,
+                "Помыть машину");
 
-        inMemoryTaskManager.addEpic(epic1);
-        inMemoryTaskManager.addEpic(epic2);
+        manager.addEpic(epic1);
+        manager.addEpic(epic2);
         //=================================================
 
         //Добавление подзадач
-        Subtask subtask1 = new Subtask("Подзадача #1", "Набросать список классов и методов",
-                TaskStatus.IN_PROGRESS, ++id, epic1.getId());
-        Subtask subtask2 = new Subtask("Подзадача #2", "Проверить работоспособность кода",
-                TaskStatus.NEW, ++id, epic1.getId());
-        Subtask subtask3 = new Subtask("Подзадача #3", "Закоммитить код и затем запушить его",
-                TaskStatus.NEW, ++id, epic1.getId());
+        Subtask subtask1 = new Subtask(++id, TaskType.SUBTASK, "Подзадача №1", TaskStatus.NEW,
+                "Набросать список классов и методов", epic1.getId());
+        Subtask subtask2 = new Subtask(++id, TaskType.SUBTASK, "Подзадача №2", TaskStatus.NEW,
+                "Проверить работоспособность кода", epic1.getId());
+        Subtask subtask3 = new Subtask(++id, TaskType.SUBTASK, "Подзадача №3", TaskStatus.NEW,
+                "Закоммитить код и затем запушить его", epic1.getId());
 
-        Subtask subtask4 = new Subtask("Подзадача #4", "Записаться в ЕвроАвто",
-                TaskStatus.IN_PROGRESS, ++id, epic2.getId());
+        Subtask subtask4 = new Subtask(++id, TaskType.SUBTASK, "Подзадача №4", TaskStatus.IN_PROGRESS,
+                "Записаться в ЕвроАвто", epic2.getId());
 
-        inMemoryTaskManager.addSubtask(subtask1, epic1);
-        inMemoryTaskManager.addSubtask(subtask2, epic1);
-        inMemoryTaskManager.addSubtask(subtask3, epic1);
-        inMemoryTaskManager.addSubtask(subtask4, epic2);
+        manager.addSubtask(subtask1, epic1);
+        manager.addSubtask(subtask2, epic1);
+        manager.addSubtask(subtask3, epic1);
+        manager.addSubtask(subtask4, epic2);
         //=================================================
 
         //Обновление подзадач в эпике
-        Subtask subtask5 = new Subtask("Подзадача #4", "Перенести запись в ЕвроАвто",
-                TaskStatus.NEW, ++id, epic2.getId());
-        inMemoryTaskManager.updateSubtask(subtask5, epic2);
+        Subtask subtask5 = new Subtask(++id, TaskType.SUBTASK, "Подзадача №4", TaskStatus.NEW,
+                "Перенести запись в ЕвроАвто", epic2.getId());
+
+        manager.updateSubtask(subtask5, epic2);
         //=================================================
 
         //Тестирование кода
-        inMemoryTaskManager.getEpicById(3);
-        inMemoryTaskManager.getEpicById(4);
-        inMemoryTaskManager.getEpicById(3);
+        manager.getEpicById(3);
+        manager.getEpicById(4);
+        manager.getEpicById(3);
 
-        inMemoryTaskManager.getTaskById(1);
-        inMemoryTaskManager.getTaskById(2);
-        inMemoryTaskManager.getTaskById(2);
+        manager.getTaskById(1);
+        manager.getTaskById(2);
+        manager.getTaskById(2);
 
-        inMemoryTaskManager.getSubTaskById(5);
-        inMemoryTaskManager.getSubTaskById(6);
-        inMemoryTaskManager.getSubTaskById(6);
-        inMemoryTaskManager.getSubTaskById(7);
-
-        System.out.println();
-        System.out.println(inMemoryTaskManager.getHistory());
-
-        inMemoryTaskManager.removeTaskById(2);
-        inMemoryTaskManager.removeEpicById(3);
+        manager.getSubTaskById(5);
+        manager.getSubTaskById(6);
+        manager.getSubTaskById(6);
+        manager.getSubTaskById(7);
 
         System.out.println();
-        System.out.println(inMemoryTaskManager.getHistory());
+        System.out.println(manager.getHistory());
+
+        manager.removeTaskById(2);
+        manager.removeEpicById(3);
+
+        System.out.println();
+        System.out.println(manager.getHistory());
         //=================================================
 
     }

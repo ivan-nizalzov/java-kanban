@@ -1,6 +1,7 @@
 package ru.yandex.practicum.history;
 
 import ru.yandex.practicum.tasks.Task;
+
 import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
@@ -12,7 +13,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     private final HashMap<Integer, Node> history = new HashMap<>();
 
     @Override
-    public void add(Task task) {
+    public void addHistory(Task task) {
         Node<Task> node = linkLast(task);
         if (task == null) {
             return;
@@ -23,7 +24,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void remove(int id) {
+    public void removeHistoryById(int id) {
         history.remove(id);
         removeNode(history.get(id));
     }
@@ -31,6 +32,20 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public List<Task> getHistory() {
         return getTasks();
+    }
+
+    @Override
+    public String historyToString() {
+        List<Task> tempArrayList = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+
+        tempArrayList = getHistory();
+
+        for (int i = 0; i < tempArrayList.size(); i++) {
+            sb.append(tempArrayList.get(i).getId()).append(",");
+        }
+
+        return sb.toString();
     }
 
     private ArrayList<Task> getTasks() {
@@ -77,5 +92,4 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
         --sizeOfCustomLinkedList;
     }
-
 }

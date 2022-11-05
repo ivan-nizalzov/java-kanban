@@ -4,18 +4,28 @@ import java.util.Objects;
 
 public class Task {
 
+    private int id; //Уникальный идентификационный номер задачи
+    private TaskType taskType; //Тип задачи
     private String taskName; //Наименование задачи
     private String taskDescription; //Описание задачи
     private TaskStatus taskStatus; //Статус задачи
-    private int id; //Уникальный идентификационный номер задачи
 
-    public Task(String taskName, String taskDescription, TaskStatus taskStatus, int id) {
-        this.taskName = taskName;
-        this.taskDescription = taskDescription;
-        this.taskStatus = taskStatus;
+
+    public Task(int id, TaskType taskType, String taskName, TaskStatus taskStatus, String taskDescription) {
         this.id = id;
+        this.taskType = taskType;
+        this.taskName = taskName;
+        this.taskStatus = taskStatus;
+        this.taskDescription = taskDescription;
     }
 
+    public TaskType getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
+    }
     public String getTaskName() {
         return taskName;
     }
@@ -66,9 +76,10 @@ public class Task {
     public String toString() {
         return "Task: {" +
                 "taskId=" + getId() +
+                ", taskType=" + getTaskType() +
                 ", taskName=" + getTaskName() +
                 ", taskStatus=" + getTaskStatus() +
-                ", taskDescription= '" + getTaskDescription() + "'}" + "\n";
+                ", taskDescription= '" + getTaskDescription() + "'}" + System.lineSeparator();
 
     }
 }

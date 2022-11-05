@@ -6,7 +6,6 @@ import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
 import ru.yandex.practicum.tasks.TaskStatus;
 
-import javax.crypto.spec.PSource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,11 +13,24 @@ import java.util.NoSuchElementException;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private HashMap<Integer, Epic> epics = new HashMap<>();
-    private HashMap<Integer, Task> tasks = new HashMap<>();
-    private HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    public HashMap<Integer, Epic> epics = new HashMap<>();
+    public HashMap<Integer, Task> tasks = new HashMap<>();
+    public HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    private static int idCounter = 0;
 
-    private HistoryManager historyManager = Managers.getDefaultHistory();
+    public HistoryManager historyManager = Managers.getDefaultHistory();
+
+    public HistoryManager getHistoryManager() {
+        return historyManager;
+    }
+
+    public static int getIdCounter() {
+        return idCounter;
+    }
+
+    public static void setIdCounter(int idCounter) {
+        InMemoryTaskManager.idCounter = idCounter;
+    }
 
     @Override
     public HashMap<Integer, Epic> getEpics() {
@@ -73,7 +85,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic getEpicById(int id) {
         if (epics.containsKey(id)) {
-            historyManager.add(epics.get(id));
+            historyManager.addHistory(epics.get(id));
             return epics.get(id);
         } else {
             throw new NoSuchElementException();
@@ -83,7 +95,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTaskById(int id) {
         if (tasks.containsKey(id)) {
-            historyManager.add(tasks.get(id));
+            historyManager.addHistory(tasks.get(id));
             return tasks.get(id);
         } else {
             throw new NoSuchElementException();
@@ -93,7 +105,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask getSubTaskById(int id) {
         if (subtasks.containsKey(id)) {
-            historyManager.add(subtasks.get(id));
+            historyManager.addHistory(subtasks.get(id));
             return subtasks.get(id);
         } else {
             throw new NoSuchElementException();
@@ -148,7 +160,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeEpicById(int id) {
         epics.remove(id);
-        historyManager.remove(id);
+        historyManager.removeHistoryById(id);
 
         List<Subtask> tempList = new ArrayList<>();
         for (Subtask subtask : subtasks.values()) {
@@ -158,20 +170,20 @@ public class InMemoryTaskManager implements TaskManager {
         }
         for (Subtask subtask : tempList) {
             subtasks.remove(subtask.getId());
-            historyManager.remove(subtask.getId());
+            historyManager.removeHistoryById(subtask.getId());
         }
     }
 
     @Override
     public void removeTaskById(int id) {
         tasks.remove(id);
-        historyManager.remove(id);
+        historyManager.removeHistoryById(id);
     }
 
     @Override
     public void removeSubtaskById(int id, Epic epic) {
         subtasks.remove(id);
-        historyManager.remove(id);
+        historyManager.removeHistoryById(id);
         updateStatusOfEpic(epic);
     }
     //=================================================
