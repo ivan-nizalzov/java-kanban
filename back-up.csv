@@ -1,7 +1,7 @@
 id,type,name,status,description,epic
 1,TASK,Задача #1,NEW,Забрать заказ в аптеке
-4,EPIC,Эпик №2,IN_PROGRESS,Помыть машину
-8,SUBTASK,Подзадача №4,IN_PROGRESS,Записаться в ЕвроАвто
-9,SUBTASK,Подзадача №4,NEW,Перенести запись в ЕвроАвто
+4,EPIC,Эпик #2,IN_PROGRESS,Помыть машину
+8,SUBTASK,Подзадача #4,IN_PROGRESS,Записаться в ЕвроАвто,4
+9,SUBTASK,Подзадача #4,NEW,Перенести запись в ЕвроАвто,4
 
-1,4,
+1,4

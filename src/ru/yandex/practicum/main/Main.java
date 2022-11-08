@@ -3,29 +3,13 @@ package ru.yandex.practicum.main;
 import ru.yandex.practicum.manager.FileBackedTaskManager;
 import ru.yandex.practicum.manager.InMemoryTaskManager;
 import ru.yandex.practicum.manager.Managers;
+import ru.yandex.practicum.manager.TaskManager;
 import ru.yandex.practicum.tasks.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static ru.yandex.practicum.manager.FileBackedTaskManager.PATH;
 
 public class Main {
     public static void main(String[] args) {
 
-        FileBackedTaskManager manager = Managers.getDefaultFileBackedTaskManager();
-
-        if (Files.exists(Paths.get(PATH, "back-up.csv"))) {
-            try {
-                manager.loadFromLife("back-up.csv");
-            } catch (IOException e) {
-                System.out.println("Произошла ошибка при попытке открытия файла!" + "\n" + e.getMessage());
-                e.printStackTrace();
-            }
-        } else {
-            FileBackedTaskManager.createBackUpFile();
-        }
+        TaskManager manager = Managers.getDefaultTaskManager();
         int id = InMemoryTaskManager.getIdCounter();
 
         //Добавление задач
@@ -39,9 +23,9 @@ public class Main {
         //=================================================
 
         //Добавление эпиков
-        Epic epic1 = new Epic(++id, TaskType.EPIC, "Эпик №1", TaskStatus.NEW,
+        Epic epic1 = new Epic(++id, TaskType.EPIC, "Эпик #1", TaskStatus.NEW,
                 "Выполнить финалку 6-го спринта");
-        Epic epic2 = new Epic(++id, TaskType.EPIC, "Эпик №2", TaskStatus.NEW,
+        Epic epic2 = new Epic(++id, TaskType.EPIC, "Эпик #2", TaskStatus.NEW,
                 "Помыть машину");
 
         manager.addEpic(epic1);
@@ -49,14 +33,14 @@ public class Main {
         //=================================================
 
         //Добавление подзадач
-        Subtask subtask1 = new Subtask(++id, TaskType.SUBTASK, "Подзадача №1", TaskStatus.NEW,
+        Subtask subtask1 = new Subtask(++id, TaskType.SUBTASK, "Подзадача #1", TaskStatus.NEW,
                 "Набросать список классов и методов", epic1.getId());
-        Subtask subtask2 = new Subtask(++id, TaskType.SUBTASK, "Подзадача №2", TaskStatus.NEW,
+        Subtask subtask2 = new Subtask(++id, TaskType.SUBTASK, "Подзадача #2", TaskStatus.NEW,
                 "Проверить работоспособность кода", epic1.getId());
-        Subtask subtask3 = new Subtask(++id, TaskType.SUBTASK, "Подзадача №3", TaskStatus.NEW,
+        Subtask subtask3 = new Subtask(++id, TaskType.SUBTASK, "Подзадача #3", TaskStatus.NEW,
                 "Закоммитить код и затем запушить его", epic1.getId());
 
-        Subtask subtask4 = new Subtask(++id, TaskType.SUBTASK, "Подзадача №4", TaskStatus.IN_PROGRESS,
+        Subtask subtask4 = new Subtask(++id, TaskType.SUBTASK, "Подзадача #4", TaskStatus.IN_PROGRESS,
                 "Записаться в ЕвроАвто", epic2.getId());
 
         manager.addSubtask(subtask1, epic1);
@@ -66,7 +50,7 @@ public class Main {
         //=================================================
 
         //Обновление подзадач в эпике
-        Subtask subtask5 = new Subtask(++id, TaskType.SUBTASK, "Подзадача №4", TaskStatus.NEW,
+        Subtask subtask5 = new Subtask(++id, TaskType.SUBTASK, "Подзадача #4", TaskStatus.NEW,
                 "Перенести запись в ЕвроАвто", epic2.getId());
 
         manager.updateSubtask(subtask5, epic2);

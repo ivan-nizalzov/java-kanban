@@ -13,16 +13,12 @@ import java.util.NoSuchElementException;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    public HashMap<Integer, Epic> epics = new HashMap<>();
-    public HashMap<Integer, Task> tasks = new HashMap<>();
-    public HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    public static HashMap<Integer, Epic> epics = new HashMap<>();
+    public static HashMap<Integer, Task> tasks = new HashMap<>();
+    public static HashMap<Integer, Subtask> subtasks = new HashMap<>();
     private static int idCounter = 0;
 
-    public HistoryManager historyManager = Managers.getDefaultHistory();
-
-    public HistoryManager getHistoryManager() {
-        return historyManager;
-    }
+    public static HistoryManager historyManager = Managers.getDefaultHistory();
 
     public static int getIdCounter() {
         return idCounter;

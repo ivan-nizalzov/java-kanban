@@ -10,7 +10,6 @@ public class Task {
     private String taskDescription; //Описание задачи
     private TaskStatus taskStatus; //Статус задачи
 
-
     public Task(int id, TaskType taskType, String taskName, TaskStatus taskStatus, String taskDescription) {
         this.id = id;
         this.taskType = taskType;

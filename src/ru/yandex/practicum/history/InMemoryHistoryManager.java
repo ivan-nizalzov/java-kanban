@@ -1,8 +1,8 @@
 package ru.yandex.practicum.history;
 
 import ru.yandex.practicum.tasks.Task;
-
 import java.util.*;
+import static java.util.stream.Collectors.joining;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
@@ -36,16 +36,11 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public String historyToString() {
-        List<Task> tempArrayList = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
+        List<Task> tempArrayList = getTasks();
 
-        tempArrayList = getHistory();
-
-        for (int i = 0; i < tempArrayList.size(); i++) {
-            sb.append(tempArrayList.get(i).getId()).append(",");
-        }
-
-        return sb.toString();
+        return tempArrayList.stream()
+                .map(task -> Integer.toString(task.getId()))
+                .collect(joining(","));
     }
 
     private ArrayList<Task> getTasks() {
