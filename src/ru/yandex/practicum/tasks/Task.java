@@ -78,7 +78,7 @@ public class Task {
                 ", taskType=" + getTaskType() +
                 ", taskName=" + getTaskName() +
                 ", taskStatus=" + getTaskStatus() +
-                ", taskDescription= '" + getTaskDescription() + "'}" + System.lineSeparator();
+                ", taskDescription='" + getTaskDescription() + "'}" + System.lineSeparator();
 
     }
 }

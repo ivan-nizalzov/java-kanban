@@ -41,7 +41,7 @@ public class Subtask extends Task {
                 ", taskType=" + getTaskType() +
                 ", taskName=" + getTaskName() +
                 ", taskStatus=" + getTaskStatus() +
-                ", taskDescription= '" + getTaskDescription() +
-                ", epicId= '" + getEpicId() + "'}" + System.lineSeparator();
+                ", taskDescription='" + getTaskDescription() +
+                ", epicId='" + getEpicId() + "'}" + System.lineSeparator();
     }
 }

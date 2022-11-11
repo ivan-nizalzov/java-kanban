@@ -45,6 +45,6 @@ public class Epic extends Task {
                 ", taskType=" + getTaskType() +
                 ", taskName=" + getTaskName() +
                 ", taskStatus=" + getTaskStatus() +
-                ", taskDescription= '" + getTaskDescription() + "'}" + System.lineSeparator();
+                ", taskDescription='" + getTaskDescription() + "'}" + System.lineSeparator();
     }
 }
