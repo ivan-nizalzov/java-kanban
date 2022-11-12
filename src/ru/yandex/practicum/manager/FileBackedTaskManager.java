@@ -64,6 +64,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static FileBackedTaskManager loadFromLife(File file) throws IOException {
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager();
+
         try (BufferedReader fileReader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
 
             List<String> listLine = new ArrayList<>();
@@ -114,7 +116,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new ManagerSaveException("Произошла ошибка при чтении данных из файла!" + "\n" + e.getMessage());
         }
-        return new FileBackedTaskManager();
+        return fileBackedTaskManager;
     }
 
     //Удаление всех задач для каждой HashMap
@@ -241,13 +243,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     //В соответствие с ТЗ создаю второй метод main() для тестирования кода менеджера FileBackedTaskManager
     public static void main(String[] args) throws IOException {
 
-        FileBackedTaskManager manager = Managers.getDefaultFileBackedManager();
-
-        // ПРИМЕЧАНИЕ: часть кода закомментировано. Необходимо раскомментировать код ниже, чтобы
-        // заработал тест из ТЗ (создание таска, эпика и двух сабтасков к нему, а затем сохранения истории в файл
-
-        /*
         //Сценарий тестирования создания таксов и их просмотра для сохранения в истории
+        FileBackedTaskManager manager = new FileBackedTaskManager(new File("back-up.csv"));
         int id = InMemoryTaskManager.getIdCounter();
         //=================================================
         Task task1 = new Task(++id, TaskType.TASK, "Задача #1", TaskStatus.NEW,
@@ -276,19 +273,25 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         manager.getSubTaskById(4);
         //=================================================
         System.out.println();
+        System.out.println(">>Первый менеджер: ");
+        System.out.println("\n" + "Вывод тасков:");
+        System.out.println(manager.tasks.toString());
+        System.out.println(manager.epics.toString());
+        System.out.println(manager.subtasks.toString());
+        System.out.println("\n" + "Вывод истории: ");
         System.out.println(manager.getHistory());
         //=================================================
-        */
 
         //Тестирование сериализации
-        FileBackedTaskManager newFileBackedManager = new FileBackedTaskManager(new File("back-up.csv"));
+        FileBackedTaskManager newManager =
+                FileBackedTaskManager.loadFromLife(new File("back-up.csv"));
 
-        newFileBackedManager.loadFromLife(new File("back-up.csv"));
+        System.out.println("\n" + ">>Второй менеджер: ");
         System.out.println("\n" + "Вывод тасков:");
-        System.out.println(newFileBackedManager.tasks.toString());
-        System.out.println(newFileBackedManager.epics.toString());
-        System.out.println(newFileBackedManager.subtasks.toString());
+        System.out.println(newManager.tasks.toString());
+        System.out.println(newManager.epics.toString());
+        System.out.println(newManager.subtasks.toString());
         System.out.println("\n" + "Вывод истории: ");
-        System.out.println(newFileBackedManager.historyManager.getHistory());
+        System.out.println(newManager.historyManager.getHistory());
     }
 }
