@@ -10,12 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ru.yandex.practicum.manager.CSVTaskFormat.*;
-
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private File file;
-    static Map<Integer, Task> allTasks = new HashMap<>();
 
     public FileBackedTaskManager(File file) {
         super();
@@ -44,26 +41,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    //РЕВЬЮЕРУ: данный метод единственный возвращает все такси, эпики и их сабтаски
-    //В InMemoryTaskManager метод getAllSubtasks(int id, Epic epic) возвращает только сабтаски
-    //Не знаю, зачем он нужен вообще, если нигде не используется (вызов всех сабтасков),
-    //но реализацию данного метода требовали в ТЗ 3-го спринта
-    private static Map<Integer, Task> getAllTasks() {
-        for (Task task : tasks.values()) {
-            allTasks.put(task.getId(), task);
-        }
-        for (Epic epic : epics.values()) {
-            allTasks.put(epic.getId(), epic);
-        }
-
-        for (Subtask subtask : subtasks.values()) {
-            allTasks.put(subtask.getId(), subtask);
-        }
-
-        return allTasks;
-    }
-
-    public static FileBackedTaskManager loadFromLife(File file) throws IOException {
+    public static FileBackedTaskManager loadFromLife(File file) {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager();
 
         try (BufferedReader fileReader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
@@ -87,28 +65,32 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
                     if (lineArray[1].equals(TaskType.TASK.toString())) {
                         int id = Integer.parseInt(lineArray[0]);
-                        restoreListOfTasks(fromStringToTask(lineArray, TaskType.TASK));
                         if (getIdCounter() <= id) {
                             setIdCounter(id);
                         }
+                        fileBackedTaskManager.addTask(CSVTaskFormat.fromStringToTask(lineArray, TaskType.TASK));
 
                     } else if (lineArray[1].equals(TaskType.EPIC.toString())) {
                         int id = Integer.parseInt(lineArray[0]);
-                        restoreListOfEpics(fromStringToEpic(lineArray, TaskType.EPIC));
                         if (getIdCounter() <= id) {
                             setIdCounter(id);
                         }
+                        fileBackedTaskManager.addEpic(CSVTaskFormat.fromStringToEpic(lineArray, TaskType.EPIC));
                     } else if (lineArray[1].equals(TaskType.SUBTASK.toString())) {
                         int id = Integer.parseInt(lineArray[0]);
-                        restoreListOfSubtasks(fromStringToSubtask(lineArray, TaskType.SUBTASK));
                         if (getIdCounter() <= id) {
                             setIdCounter(id);
                         }
+                        fileBackedTaskManager.addSubtask(CSVTaskFormat.fromStringToSubtask(lineArray, TaskType.SUBTASK));
                     } else {
-                        Map<Integer, Task> test = getAllTasks();
+                        Map<Integer, Task> test = new HashMap<>();
+                        test.putAll(fileBackedTaskManager.getTasks());
+                        test.putAll(fileBackedTaskManager.getEpics());
+                        test.putAll(fileBackedTaskManager.getSubtasks());
 
-                        for (int k = 0; k < lineArray.length; k++) {
-                            historyManager.addHistory(test.get(Integer.parseInt(lineArray[k])));
+                        for (String s : lineArray) {
+                            fileBackedTaskManager.historyManager.addHistory(
+                                    test.get(Integer.parseInt(s)));
                         }
                     }
                 }
@@ -176,8 +158,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void addSubtask(Subtask subtask, Epic epic) {
-        super.addSubtask(subtask, epic);
+    public void addSubtask(Subtask subtask) {
+        super.addSubtask(subtask);
         save();
     }
     //=================================================
@@ -222,26 +204,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
     //=================================================
 
-    //Методы для восстановления состояния менеджера после выполнения loadFromFile
-    public static void restoreListOfTasks(Task task) {
-        tasks.put(task.getId(), task);
-    }
-
-    public static void restoreListOfEpics(Epic epic) {
-        epics.put(epic.getId(), epic);
-    }
-
-    public static void restoreListOfSubtasks(Subtask subtask) {
-        subtasks.put(subtask.getId(), subtask);
-    }
-
-    public static void restoreHistory() {
-
-    }
-    //=================================================
 
     //В соответствие с ТЗ создаю второй метод main() для тестирования кода менеджера FileBackedTaskManager
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         //Сценарий тестирования создания таксов и их просмотра для сохранения в истории
         FileBackedTaskManager manager = new FileBackedTaskManager(new File("back-up.csv"));
@@ -263,9 +228,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         Subtask subtask3 = new Subtask(++id, TaskType.SUBTASK, "Подзадача #3", TaskStatus.NEW,
                 "Закоммитить код и затем запушить его", id1);
 
-        manager.addSubtask(subtask1, epic1);
-        manager.addSubtask(subtask2, epic1);
-        manager.addSubtask(subtask3, epic1);
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+        manager.addSubtask(subtask3);
         //=================================================
         manager.getEpicById(2);
         manager.getTaskById(1);

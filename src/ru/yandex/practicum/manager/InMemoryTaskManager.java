@@ -13,12 +13,12 @@ import java.util.NoSuchElementException;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    public static HashMap<Integer, Epic> epics = new HashMap<>();
-    public static HashMap<Integer, Task> tasks = new HashMap<>();
-    public static HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private static int idCounter = 0;
+    protected HashMap<Integer, Epic> epics = new HashMap<>();
+    protected HashMap<Integer, Task> tasks = new HashMap<>();
+    protected HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    protected static int idCounter = 0;
 
-    public static HistoryManager historyManager = Managers.getDefaultHistory();
+    protected HistoryManager historyManager = Managers.getDefaultHistory();
 
     public static int getIdCounter() {
         return idCounter;
@@ -122,10 +122,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addSubtask(Subtask subtask, Epic epic) {
+    public void addSubtask(Subtask subtask) {
         subtasks.put(subtask.getId(), subtask);
-        epic.setSubtasks(subtask);
-        updateStatusOfEpic(epic);
+        epics.get(subtask.getEpicId()).setSubtasks(subtask);
+        updateStatusOfEpic(epics.get(subtask.getEpicId()));
     }
     //=================================================
 

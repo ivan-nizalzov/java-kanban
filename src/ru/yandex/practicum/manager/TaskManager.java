@@ -45,7 +45,7 @@ public interface TaskManager {
 
     void addTask(Task task);
 
-    void addSubtask(Subtask subtask, Epic epic);
+    void addSubtask(Subtask subtask);
     //=================================================
 
     //Обновление задач
@@ -65,10 +65,10 @@ public interface TaskManager {
     //=================================================
 
     //Получение списка всех подзадач эпика
-    public ArrayList<Subtask> getAllSubtasks(int id, Epic epic);
+    ArrayList<Subtask> getAllSubtasks(int id, Epic epic);
     //=================================================
 
     //Метод возвращает историю просмотренных задач
-    public List<Task> getHistory();
+    List<Task> getHistory();
     //=================================================
 }

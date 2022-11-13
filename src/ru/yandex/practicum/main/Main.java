@@ -1,6 +1,5 @@
 package ru.yandex.practicum.main;
 
-import ru.yandex.practicum.manager.FileBackedTaskManager;
 import ru.yandex.practicum.manager.InMemoryTaskManager;
 import ru.yandex.practicum.manager.Managers;
 import ru.yandex.practicum.manager.TaskManager;
@@ -43,10 +42,10 @@ public class Main {
         Subtask subtask4 = new Subtask(++id, TaskType.SUBTASK, "Подзадача #4", TaskStatus.IN_PROGRESS,
                 "Записаться в ЕвроАвто", epic2.getId());
 
-        manager.addSubtask(subtask1, epic1);
-        manager.addSubtask(subtask2, epic1);
-        manager.addSubtask(subtask3, epic1);
-        manager.addSubtask(subtask4, epic2);
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+        manager.addSubtask(subtask3);
+        manager.addSubtask(subtask4);
         //=================================================
 
         //Обновление подзадач в эпике
