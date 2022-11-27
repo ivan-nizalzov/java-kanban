@@ -1,6 +1,6 @@
-package ru.yandex.practicum.history;
+package ru.yandex.practicum.kanban.history;
 
-import ru.yandex.practicum.tasks.Task;
+import ru.yandex.practicum.kanban.tasks.Task;
 import java.util.*;
 import static java.util.stream.Collectors.joining;
 
@@ -38,9 +38,12 @@ public class InMemoryHistoryManager implements HistoryManager {
     public String historyToString() {
         List<Task> tempArrayList = getTasks();
 
-        return tempArrayList.stream()
-                .map(task -> Integer.toString(task.getId()))
-                .collect(joining(","));
+        String str = String.join(",",
+                                tempArrayList.stream()
+                                        .map(task -> Integer.toString(task.getId()))
+                                        .collect(joining(",")));
+
+        return str;
     }
 
     private ArrayList<Task> getTasks() {

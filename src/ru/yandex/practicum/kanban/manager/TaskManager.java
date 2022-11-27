@@ -1,14 +1,15 @@
-package ru.yandex.practicum.manager;
+package ru.yandex.practicum.kanban.manager;
 
-import ru.yandex.practicum.tasks.Epic;
-import ru.yandex.practicum.tasks.Subtask;
-import ru.yandex.practicum.tasks.Task;
+import ru.yandex.practicum.kanban.tasks.Epic;
+import ru.yandex.practicum.kanban.tasks.Subtask;
+import ru.yandex.practicum.kanban.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
-public interface TaskManager {
+public interface TaskManager{
 
     HashMap<Integer, Epic> getEpics();
 
@@ -37,7 +38,7 @@ public interface TaskManager {
 
     Task getTaskById(int id);
 
-    Subtask getSubTaskById(int id);
+    Subtask getSubtaskById(int id);
     //=================================================
 
     //Создание задачи с присвоением id
@@ -65,10 +66,21 @@ public interface TaskManager {
     //=================================================
 
     //Получение списка всех подзадач эпика
-    ArrayList<Subtask> getAllSubtasks(int id, Epic epic);
+    ArrayList<Subtask> getAllSubtasks(Epic epic);
     //=================================================
 
     //Метод возвращает историю просмотренных задач
     List<Task> getHistory();
+    //=================================================
+
+    //Метод проверяет задачу на пересечение по времени выполнения с остальными (перегрузка для экземпляров Task)
+    void checkStartTimeCrossing(Task task);
+    //=================================================
+    //Метод проверяет задачу на пересечение по времени выполнения с остальными (перегрузка для экземпляров Subtask)
+    void checkStartTimeCrossing(Subtask subtask);
+    //=================================================
+
+    //Метод возвращает отсортированный по дате и времени старта выполнения задачи
+    Set<Task> getPrioritizedTasks();
     //=================================================
 }

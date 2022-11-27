@@ -1,4 +1,4 @@
-package ru.yandex.practicum.history;
+package ru.yandex.practicum.kanban.history;
 
 public class Node<E> {
     public E data;

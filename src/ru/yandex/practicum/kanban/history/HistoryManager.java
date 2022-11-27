@@ -1,6 +1,6 @@
-package ru.yandex.practicum.history;
+package ru.yandex.practicum.kanban.history;
 
-import ru.yandex.practicum.tasks.Task;
+import ru.yandex.practicum.kanban.tasks.Task;
 
 import java.util.List;
 

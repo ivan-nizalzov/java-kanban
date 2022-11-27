@@ -1,9 +1,7 @@
-package ru.yandex.practicum.manager;
+package ru.yandex.practicum.kanban.manager;
 
-import ru.yandex.practicum.history.HistoryManager;
-import ru.yandex.practicum.history.InMemoryHistoryManager;
-
-import java.io.File;
+import ru.yandex.practicum.kanban.history.HistoryManager;
+import ru.yandex.practicum.kanban.history.InMemoryHistoryManager;
 
 public class Managers {
 

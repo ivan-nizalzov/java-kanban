@@ -1,15 +1,13 @@
-package ru.yandex.practicum.manager;
+package ru.yandex.practicum.kanban.manager;
 
-import ru.yandex.practicum.history.HistoryManager;
-import ru.yandex.practicum.tasks.Epic;
-import ru.yandex.practicum.tasks.Subtask;
-import ru.yandex.practicum.tasks.Task;
-import ru.yandex.practicum.tasks.TaskStatus;
+import ru.yandex.practicum.kanban.exception.ManagerSaveException;
+import ru.yandex.practicum.kanban.history.HistoryManager;
+import ru.yandex.practicum.kanban.tasks.Epic;
+import ru.yandex.practicum.kanban.tasks.Subtask;
+import ru.yandex.practicum.kanban.tasks.Task;
+import ru.yandex.practicum.kanban.tasks.TaskStatus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -19,6 +17,42 @@ public class InMemoryTaskManager implements TaskManager {
     protected static int idCounter = 0;
 
     protected HistoryManager historyManager = Managers.getDefaultHistory();
+
+    Comparator<Task> comparator = Comparator.comparing(Task::getStartTime);
+    protected TreeSet<Task> prioritizedTasks = new TreeSet<>(comparator);
+
+    protected void prioritizeTask(Task task) {
+        prioritizedTasks.add(task);
+    }
+
+    //Вывод списка задач в порядке приоритета (по startTime)
+    @Override
+    public Set<Task> getPrioritizedTasks() {
+        return prioritizedTasks;
+    }
+    //=================================================
+
+    @Override
+    public void checkStartTimeCrossing(Task task) {
+        for (Task element : tasks.values()) {
+            if (task.getStartTime().isAfter(element.getStartTime())
+            && task.getStartTime().isBefore(element.getEndTime())) {
+                throw new ManagerSaveException("Найдено пересечение по времени при добавлении/изменении задачи." + "\n" +
+                        "Проверьте корректность вносимых данных (дата и время старта задачи).");
+            }
+        }
+    }
+
+    @Override
+    public void checkStartTimeCrossing(Subtask subtask) {
+        for (Task element : tasks.values()) {
+            if (subtask.getStartTime().isAfter(element.getStartTime())
+                    && subtask.getStartTime().isBefore(element.getEndTime())) {
+                throw new ManagerSaveException("Найдено пересечение по времени при добавлении/изменении задачи." + "\n" +
+                        "Проверьте корректность вносимых данных (дата и время старта задачи).");
+            }
+        }
+    }
 
     public static int getIdCounter() {
         return idCounter;
@@ -99,7 +133,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask getSubTaskById(int id) {
+    public Subtask getSubtaskById(int id) {
         if (subtasks.containsKey(id)) {
             historyManager.addHistory(subtasks.get(id));
             return subtasks.get(id);
@@ -119,11 +153,15 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addTask(Task task) {
         tasks.put(task.getId(), task);
+        checkStartTimeCrossing(task);
+        prioritizeTask(task);
     }
 
     @Override
     public void addSubtask(Subtask subtask) {
         subtasks.put(subtask.getId(), subtask);
+        checkStartTimeCrossing(subtask);
+        prioritizeTask(subtask);
         epics.get(subtask.getEpicId()).setSubtasks(subtask);
         updateStatusOfEpic(epics.get(subtask.getEpicId()));
     }
@@ -141,12 +179,16 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateTask(Task task) {
         tasks.remove(task.getId());
         tasks.put(task.getId(), task);
+        checkStartTimeCrossing(task);
+        prioritizeTask(task);
     }
 
     @Override
     public void updateSubtask(Subtask subtask, Epic epic) {
         subtasks.remove(subtask.getId());
         subtasks.put(subtask.getId(), subtask);
+        checkStartTimeCrossing(subtask);
+        prioritizeTask(subtask);
         epic.setSubtasks(subtask);
         updateStatusOfEpic(epic);
     }
@@ -173,12 +215,22 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeTaskById(int id) {
         tasks.remove(id);
+        for (Task task : prioritizedTasks) {
+            if (task.getId() == id) {
+                prioritizedTasks.remove(task);
+            }
+        }
         historyManager.removeHistoryById(id);
     }
 
     @Override
     public void removeSubtaskById(int id, Epic epic) {
         subtasks.remove(id);
+        for (Task task : prioritizedTasks) {
+            if (task.getId() == id) {
+                prioritizedTasks.remove(task);
+            }
+        }
         historyManager.removeHistoryById(id);
         updateStatusOfEpic(epic);
     }
@@ -186,9 +238,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     //Получение списка всех подзадач эпика
     @Override
-    public ArrayList<Subtask> getAllSubtasks(int id, Epic epic) {
-        ArrayList<Subtask> subtaskList = new ArrayList<>();
-        subtaskList = epic.getSubtasks();
+    public ArrayList<Subtask> getAllSubtasks(Epic epic) {
+        ArrayList<Subtask> subtaskList = epic.getSubtasks();
         return subtaskList;
     }
     //=================================================
