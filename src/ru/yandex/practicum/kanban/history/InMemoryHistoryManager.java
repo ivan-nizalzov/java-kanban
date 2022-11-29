@@ -36,14 +36,11 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public String historyToString() {
-        List<Task> tempArrayList = getTasks();
+        List<Task> tempArrayList = getHistory();
 
-        String str = String.join(",",
-                                tempArrayList.stream()
-                                        .map(task -> Integer.toString(task.getId()))
-                                        .collect(joining(",")));
-
-        return str;
+        return tempArrayList.stream()
+                .map(task -> Integer.toString(task.getId()))
+                .collect(joining(","));
     }
 
     private ArrayList<Task> getTasks() {

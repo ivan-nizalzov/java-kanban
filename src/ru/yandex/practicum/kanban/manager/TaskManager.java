@@ -74,10 +74,10 @@ public interface TaskManager{
     //=================================================
 
     //Метод проверяет задачу на пересечение по времени выполнения с остальными (перегрузка для экземпляров Task)
-    void checkStartTimeCrossing(Task task);
+    boolean checkStartTimeCrossing(Task task);
     //=================================================
     //Метод проверяет задачу на пересечение по времени выполнения с остальными (перегрузка для экземпляров Subtask)
-    void checkStartTimeCrossing(Subtask subtask);
+    boolean checkStartTimeCrossing(Subtask subtask);
     //=================================================
 
     //Метод возвращает отсортированный по дате и времени старта выполнения задачи

@@ -4,10 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import ru.yandex.practicum.kanban.exception.ManagerSaveException;
 import ru.yandex.practicum.kanban.manager.InMemoryTaskManager;
-import ru.yandex.practicum.kanban.tasks.Epic;
-import ru.yandex.practicum.kanban.tasks.Subtask;
-import ru.yandex.practicum.kanban.tasks.TaskStatus;
-import ru.yandex.practicum.kanban.tasks.TaskType;
+import ru.yandex.practicum.kanban.tasks.*;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -17,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EpicTest {
 
-    InMemoryTaskManager manager;
+    protected InMemoryTaskManager manager;
 
     @BeforeEach
     void beforeEach() {
@@ -125,8 +122,8 @@ public class EpicTest {
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
 
-        assertEquals(LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
-                manager.getEpics().get(1).getEpicStartTime());
+        assertEquals(LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 30),
+                manager.getEpics().get(1).getEpicEndTime());
     }
     //=================================================
     @Test

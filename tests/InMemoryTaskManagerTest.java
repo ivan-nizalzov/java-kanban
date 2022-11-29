@@ -3,7 +3,7 @@ import ru.yandex.practicum.kanban.manager.InMemoryTaskManager;
 
 public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
-    InMemoryTaskManager manager;
+    protected InMemoryTaskManager manager;
     public InMemoryTaskManagerTest() {
         super(new InMemoryTaskManager());
     }
@@ -90,8 +90,8 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
     //=================================================
     @Override
     @Test
-    public void shouldCheckStartTimeCrossing() {
-        super.shouldCheckStartTimeCrossing();
+    public void shouldCheckStartTimeCrossingTasksSubtasks() {
+        super.shouldCheckStartTimeCrossingTasksSubtasks();
     }
     //=================================================
     @Override
@@ -147,8 +147,8 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
     //=================================================
     @Override
     @Test
-    public void shouldThrowExceptionWhenRemoveTaskEpicSubtaskByWrongId() {
-        super.shouldThrowExceptionWhenRemoveTaskEpicSubtaskByWrongId();
+    public void shouldAvoidDeletingWhenRemoveTaskEpicSubtaskByWrongId() {
+        super.shouldAvoidDeletingWhenRemoveTaskEpicSubtaskByWrongId();
     }
     //=================================================
     @Override

@@ -4,17 +4,47 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import ru.yandex.practicum.kanban.exception.ManagerSaveException;
 import ru.yandex.practicum.kanban.history.InMemoryHistoryManager;
-import ru.yandex.practicum.kanban.tasks.Epic;
-import ru.yandex.practicum.kanban.tasks.Subtask;
-import ru.yandex.practicum.kanban.tasks.TaskStatus;
-import ru.yandex.practicum.kanban.tasks.TaskType;
+import ru.yandex.practicum.kanban.tasks.*;
 
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.NoSuchElementException;
 
 class InMemoryHistoryManagerTest {
 
-    public InMemoryHistoryManager manager = new InMemoryHistoryManager();
+    protected InMemoryHistoryManager manager = new InMemoryHistoryManager();
+
+    public Task getTask() {
+        return new Task(
+                1,
+                TaskType.TASK,
+                "Task",
+                TaskStatus.NEW,
+                "Task description",
+                30,
+                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00));
+    }
+
+    public Epic getEpic() {
+        return new Epic(
+                2,
+                TaskType.EPIC,
+                "Epic",
+                TaskStatus.NEW,
+                "Epic description");
+    }
+
+    public Subtask getSubtask() {
+        return new Subtask(
+                3,
+                TaskType.SUBTASK,
+                "Subtask",
+                TaskStatus.NEW,
+                "Subtask description",
+                30,
+                LocalDateTime.of(2022, Month.NOVEMBER, 22, 18, 00),
+                3);
+    }
 
     // СТАНДАРТНЫЕ КЕЙСЫ.
     @Test
@@ -150,28 +180,57 @@ class InMemoryHistoryManagerTest {
 
         Assertions.assertEquals(4, manager.getHistory().size());
     }
+
     //=================================================
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // ГРАНИЧНЫЕ КЕЙСЫ.
     //Пустая история задач
     @Test
-    public void shouldThrowExceptionWhenRemoveHistoryById() {
-        ManagerSaveException ex = Assertions.assertThrows(
-                ManagerSaveException.class,
-                new Executable() {
-                    @Override
-                    public void execute() throws Throwable {
-                        manager.removeHistoryById(3);
-                    }
-                }
-        );
-        Assertions.assertEquals(ex.getMessage(), ex.getMessage());
+    public void shouldReturnEmptyLinkedListWhenRemoveEmptyHistoryById() {
+        Epic epic = new Epic(
+                1,
+                TaskType.EPIC,
+                "Epic",
+                TaskStatus.NEW,
+                "Epic description");
+        Subtask subtask1 = new Subtask(
+                2,
+                TaskType.SUBTASK,
+                "Subtask1",
+                TaskStatus.NEW,
+                "Subtask1 description",
+                30,
+                LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00),
+                1);
+        Subtask subtask2 = new Subtask(
+                3,
+                TaskType.SUBTASK,
+                "Subtask2",
+                TaskStatus.NEW,
+                "Subtask2 description",
+                30,
+                LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
+                1);
+        Subtask subtask3 = new Subtask(
+                4,
+                TaskType.SUBTASK,
+                "Subtask2",
+                TaskStatus.NEW,
+                "Subtask2 description",
+                30,
+                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00),
+                1);
+
+        Assertions.assertTrue(manager.getHistory().isEmpty());
+        manager.removeHistoryById(1);
+        Assertions.assertTrue(manager.getHistory().isEmpty());
     }
 
     @Test
     public void shouldGetEmptyHistory() {
         Assertions.assertEquals(0, manager.getHistory().size());
     }
+
     //=================================================
     //Дублирование
     @Test
@@ -221,6 +280,7 @@ class InMemoryHistoryManagerTest {
 
         Assertions.assertEquals(4, manager.getHistory().size());
     }
+
     //=================================================
     //Удаление из истории: начало, середина, конец.
     @Test
@@ -268,6 +328,7 @@ class InMemoryHistoryManagerTest {
 
         Assertions.assertEquals(3, manager.getHistory().size());
     }
+
     public void shouldRemoveHistoryByIdInTheMiddle() {
         Epic epic = new Epic(
                 1,
@@ -312,6 +373,7 @@ class InMemoryHistoryManagerTest {
 
         Assertions.assertEquals(3, manager.getHistory().size());
     }
+
     public void shouldRemoveHistoryByIdInTheEnd() {
         Epic epic = new Epic(
                 1,

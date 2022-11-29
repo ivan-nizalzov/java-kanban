@@ -9,8 +9,8 @@ import java.time.Month;
 
 public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
-    FileBackedTaskManager manager = new FileBackedTaskManager(new File("resources/back-up.csv"));
-    public FileBackedTaskManagerTest() {
+    protected FileBackedTaskManager manager = new FileBackedTaskManager(new File("resources/back-up.csv"));
+    protected FileBackedTaskManagerTest() {
         super(new FileBackedTaskManager(new File("resources/back-up.csv")));
     }
 
@@ -80,9 +80,6 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         Assertions.assertTrue(manager.getSubtasks().isEmpty());
         Assertions.assertTrue(manager.getEpics().isEmpty());
         Assertions.assertTrue(manager.getTasks().isEmpty());
-        Assertions.assertTrue(newManager.getSubtasks().isEmpty());
-        Assertions.assertTrue(newManager.getEpics().isEmpty());
-        Assertions.assertTrue(newManager.getTasks().isEmpty());
     }
     //=================================================
     // Эпик без подзадач
@@ -121,12 +118,22 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
                 30,
                 LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00),
                 1);
+        Task task = new Task(
+                5,
+                TaskType.TASK,
+                "Task",
+                TaskStatus.NEW,
+                "Task description",
+                30,
+                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00));
 
         manager.addEpic(epic);
+        manager.addTask(task);
         manager.getEpicById(1);
+        manager.getTaskById(5);
 
-        FileBackedTaskManager newManager =
-                FileBackedTaskManager.loadFromLife(new File("resources/back-up.csv"));
+        FileBackedTaskManager newManager = FileBackedTaskManager
+                .loadFromLife(new File("resources/back-up.csv"));
 
         Assertions.assertEquals(manager.getEpics().get(1), newManager.getEpics().get(1));
         Assertions.assertTrue(manager.getSubtasks().isEmpty());
@@ -269,14 +276,14 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     //=================================================
     @Override
     @Test
-    public void shouldCheckStartTimeCrossing() {
-     super.shouldCheckStartTimeCrossing();
+    public void shouldGetPrioritizedTasks() {
+        super.shouldGetPrioritizedTasks();
     }
     //=================================================
     @Override
     @Test
-    public void shouldGetPrioritizedTasks() {
-        super.shouldGetPrioritizedTasks();
+    public void shouldCheckStartTimeCrossingTasksSubtasks() {
+        super.shouldCheckStartTimeCrossingTasksSubtasks();
     }
     //=================================================
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -326,8 +333,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     //=================================================
     @Override
     @Test
-    public void shouldThrowExceptionWhenRemoveTaskEpicSubtaskByWrongId() {
-        super.shouldThrowExceptionWhenRemoveTaskEpicSubtaskByWrongId();
+    public void shouldAvoidDeletingWhenRemoveTaskEpicSubtaskByWrongId() {
+        super.shouldAvoidDeletingWhenRemoveTaskEpicSubtaskByWrongId();
     }
     //=================================================
     @Override

@@ -8,10 +8,7 @@ import java.util.Objects;
 
 public class Epic extends Task {
 
-    private ArrayList<Subtask> subtasks = new ArrayList<>();
-    int duration;
-    LocalDateTime startTime;
-    LocalDateTime endTime;
+    private ArrayList<Subtask> subtasks;
 
     public Epic(int id, TaskType taskType, String epicName, TaskStatus taskStatus,
                 String epicDescription) {
@@ -22,7 +19,7 @@ public class Epic extends Task {
     public int getEpicDuration() {
         int sumOfSubtaskDuration = 0;
         for (Subtask subtask : subtasks) {
-            sumOfSubtaskDuration += subtask.duration;
+            sumOfSubtaskDuration += subtask.getDuration();
         }
         if (sumOfSubtaskDuration < 0) {
             throw new ManagerSaveException("Продолжительность выполнения задачи не может быть меньше нуля.");
@@ -39,8 +36,8 @@ public class Epic extends Task {
         } else {
             fistStartTimeOfSubtask = subtasks.get(0).getStartTime();
             for (Subtask subtask : subtasks) {
-                if (subtask.startTime.isBefore(fistStartTimeOfSubtask)) {
-                    fistStartTimeOfSubtask = subtask.startTime;
+                if (subtask.getStartTime().isBefore(fistStartTimeOfSubtask)) {
+                    fistStartTimeOfSubtask = subtask.getStartTime();
                 }
             }
         }

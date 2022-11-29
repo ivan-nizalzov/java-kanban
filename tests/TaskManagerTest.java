@@ -1,7 +1,6 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import ru.yandex.practicum.kanban.exception.ManagerSaveException;
 import ru.yandex.practicum.kanban.manager.TaskManager;
 import ru.yandex.practicum.kanban.tasks.*;
 
@@ -365,70 +364,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
     //=================================================
     @Test
-    public void shouldCheckStartTimeCrossing() {
-        Task task = new Task(
-                1,
-                TaskType.TASK,
-                "Task",
-                TaskStatus.NEW,
-                "Task description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00));
-        Task task2 = new Task(
-                5,
-                TaskType.TASK,
-                "Task",
-                TaskStatus.NEW,
-                "Task description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00));
-        Epic epic = new Epic(
-                2,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
-        Subtask subtask = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask",
-                TaskStatus.NEW,
-                "Subtask description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00),
-                2);
-        Subtask subtask2 = new Subtask(
-                4,
-                TaskType.SUBTASK,
-                "Subtask",
-                TaskStatus.NEW,
-                "Subtask description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00),
-                2);
-
-        manager.addTask(task);
-        manager.addTask(task2);
-        manager.addEpic(epic);
-        manager.addSubtask(subtask);
-        manager.addSubtask(subtask2);
-
-        ManagerSaveException ex1 = Assertions.assertThrows(
-                ManagerSaveException.class,
-                () -> manager.checkStartTimeCrossing(task)
-        );
-        assertEquals("Найдено пересечение по времени при добавлении/изменении задачи." + "\n" +
-                "Проверьте корректность вносимых данных (дата и время старта задачи).", ex1.getMessage());
-
-        ManagerSaveException ex2 = Assertions.assertThrows(
-                ManagerSaveException.class,
-                () -> manager.checkStartTimeCrossing(subtask)
-        );
-        assertEquals("Найдено пересечение по времени при добавлении/изменении задачи." + "\n" +
-                "Проверьте корректность вносимых данных (дата и время старта задачи).", ex2.getMessage());
-    }
-    //=================================================
-    @Test
     public void shouldGetPrioritizedTasks() {
         Task task1 = new Task(
                 1,
@@ -480,6 +415,61 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Set<Task> prioritizedTasks = manager.getPrioritizedTasks();
 
         assertEquals(4, manager.getPrioritizedTasks().size());
+    }
+    //=================================================
+    @Test
+    public void shouldCheckStartTimeCrossingTasksSubtasks() {
+        Task task = new Task(
+                1,
+                TaskType.TASK,
+                "Task",
+                TaskStatus.NEW,
+                "Task description",
+                30,
+                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00));
+        Task task2 = new Task(
+                2,
+                TaskType.TASK,
+                "Task2",
+                TaskStatus.NEW,
+                "Task2 description",
+                30,
+                LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00));
+        Epic epic = new Epic(
+                3,
+                TaskType.EPIC,
+                "Epic",
+                TaskStatus.NEW,
+                "Epic description");
+        Subtask subtask = new Subtask(
+                4,
+                TaskType.SUBTASK,
+                "Subtask",
+                TaskStatus.NEW,
+                "Subtask description",
+                30,
+                LocalDateTime.of(2022, Month.NOVEMBER, 22, 18, 00),
+                3);
+        Subtask subtask2 = new Subtask(
+                4,
+                TaskType.SUBTASK,
+                "Subtask",
+                TaskStatus.NEW,
+                "Subtask description",
+                30,
+                LocalDateTime.of(2022, Month.NOVEMBER, 22, 20, 00),
+                3);
+
+        manager.addTask(task);
+        manager.addTask(task2);
+        manager.addEpic(epic);
+        manager.addSubtask(subtask);
+        manager.addSubtask(subtask2);
+
+        assertFalse(manager.checkStartTimeCrossing(task2));
+        assertFalse(manager.checkStartTimeCrossing(task));
+        assertFalse(manager.checkStartTimeCrossing(subtask2));
+        assertFalse(manager.checkStartTimeCrossing(subtask));
     }
     //=================================================
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -809,7 +799,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
     //=================================================
     @Test
-    public void shouldThrowExceptionWhenRemoveTaskEpicSubtaskByWrongId() {
+    public void shouldAvoidDeletingWhenRemoveTaskEpicSubtaskByWrongId() {
         manager.addTask(new Task(
                 1,
                 TaskType.TASK,
@@ -835,45 +825,17 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
                 2));
 
-        manager.removeTaskById(1);
-        assertTrue(manager.getTasks().isEmpty());
-        manager.removeSubtaskById(3, epic);
-        assertTrue(manager.getSubtasks().isEmpty());
-        manager.removeEpicById(2);
-        assertTrue(manager.getEpics().isEmpty());
+        assertEquals(1, manager.getTasks().size());
+        manager.removeTaskById(55);
+        assertEquals(1, manager.getTasks().size());
 
-        NoSuchElementException ex1 = Assertions.assertThrows(
-                NoSuchElementException.class,
-                new Executable() {
-                    @Override
-                    public void execute() throws Throwable {
-                        manager.removeTaskById(55);
-                    }
-                }
-        );
-        Assertions.assertEquals(ex1.getMessage(), ex1.getMessage());
+        assertEquals(1, manager.getEpics().size());
+        manager.removeEpicById(55);
+        assertEquals(1, manager.getEpics().size());
 
-        NoSuchElementException ex2 = Assertions.assertThrows(
-                NoSuchElementException.class,
-                new Executable() {
-                    @Override
-                    public void execute() throws Throwable {
-                        manager.removeSubtaskById(55, epic);
-                    }
-                }
-        );
-        Assertions.assertEquals(ex2.getMessage(), ex2.getMessage());
-
-        NullPointerException ex3 = Assertions.assertThrows(
-                NullPointerException.class,
-                new Executable() {
-                    @Override
-                    public void execute() throws Throwable {
-                        manager.removeEpicById(5);
-                    }
-                }
-        );
-        Assertions.assertEquals(ex3.getMessage(), ex3.getMessage());
+        assertEquals(1, manager.getSubtasks().size());
+        manager.removeSubtaskById(55, epic);
+        assertEquals(1, manager.getSubtasks().size());
     }
     //=================================================
     @Test

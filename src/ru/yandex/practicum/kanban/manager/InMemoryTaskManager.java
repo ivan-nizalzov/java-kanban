@@ -33,25 +33,25 @@ public class InMemoryTaskManager implements TaskManager {
     //=================================================
 
     @Override
-    public void checkStartTimeCrossing(Task task) {
+    public boolean checkStartTimeCrossing(Task task) {
         for (Task element : tasks.values()) {
             if (task.getStartTime().isAfter(element.getStartTime())
             && task.getStartTime().isBefore(element.getEndTime())) {
-                throw new ManagerSaveException("Найдено пересечение по времени при добавлении/изменении задачи." + "\n" +
-                        "Проверьте корректность вносимых данных (дата и время старта задачи).");
+                return true;
             }
         }
+        return false;
     }
 
     @Override
-    public void checkStartTimeCrossing(Subtask subtask) {
+    public boolean checkStartTimeCrossing(Subtask subtask) {
         for (Task element : tasks.values()) {
             if (subtask.getStartTime().isAfter(element.getStartTime())
                     && subtask.getStartTime().isBefore(element.getEndTime())) {
-                throw new ManagerSaveException("Найдено пересечение по времени при добавлении/изменении задачи." + "\n" +
-                        "Проверьте корректность вносимых данных (дата и время старта задачи).");
+                return true;
             }
         }
+        return false;
     }
 
     public static int getIdCounter() {

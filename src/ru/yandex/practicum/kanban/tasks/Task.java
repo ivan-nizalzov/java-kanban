@@ -10,9 +10,9 @@ public class Task {
     private String taskName; //Наименование задачи
     private String taskDescription; //Описание задачи
     private TaskStatus taskStatus; //Статус задачи
-    int duration; //Продолжительность задачи
-    LocalDateTime startTime; //Дата, когда предполагается приступить к задаче
-    LocalDateTime endTime; //Время завершения задачи (расчетное, startTime + duration)
+    private int duration; //Продолжительность задачи
+    private LocalDateTime startTime; //Дата, когда предполагается приступить к задаче
+    private LocalDateTime endTime; //Время завершения задачи (расчетное, startTime + duration)
 
     public Task(int id, TaskType taskType, String taskName, TaskStatus taskStatus,
                 String taskDescription, int duration, LocalDateTime startTime) {

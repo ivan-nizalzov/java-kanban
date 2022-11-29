@@ -28,12 +28,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private void save() {
         try {
             FileWriter fileWriter = new FileWriter("resources/back-up.csv");
-            final String head = "id,type,name,status,description,epic,duration,startTime" + System.lineSeparator();
+            final String head = "id,type,name,status,description,duration,startTime,epic" + System.lineSeparator();
 
             String tasksStr = CSVTaskFormat.tasksToString(tasks, epics, subtasks);
             String historyStr = historyManager.historyToString();
 
             String data = head + tasksStr + System.lineSeparator() + historyStr;
+            String test = historyManager.getHistory().toString();
 
             fileWriter.write(data);
             fileWriter.close();
