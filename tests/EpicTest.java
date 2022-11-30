@@ -21,33 +21,45 @@ public class EpicTest {
         manager = new InMemoryTaskManager();
     }
 
-    // СТАНДАРТНЫЕ КЕЙСЫ.
-    @Test
-    public void shouldReturnEpicDuration() {
-        Epic epic = new Epic(
-                1,
+    // Конструкторы
+    public Epic getEpic(int id) {
+        return new Epic(
+                id,
                 TaskType.EPIC,
                 "Epic",
                 TaskStatus.NEW,
                 "Epic description");
-        Subtask subtask1 = new Subtask(
-                2,
-                TaskType.SUBTASK,
-                "Subtask1",
+    }
+
+    public Task getTask(int id) {
+        return new Task(
+                id,
+                TaskType.TASK,
+                "Task",
                 TaskStatus.NEW,
-                "Subtask1 description",
+                "Task description",
                 30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00),
-                1);
-        Subtask subtask2 = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
-                1);
+                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00));
+    }
+
+   public Subtask getSubtask(int idSubtask, int idEpic) {
+       return new Subtask(
+               idSubtask,
+               TaskType.SUBTASK,
+               "Subtask",
+               TaskStatus.NEW,
+               "Subtask description",
+               30,
+               LocalDateTime.of(2022, Month.NOVEMBER, 22, 18, 00),
+               idEpic);
+   }
+
+    // СТАНДАРТНЫЕ КЕЙСЫ.
+    @Test
+    public void shouldReturnEpicDuration() {
+        Epic epic = getEpic(1);
+        Subtask subtask1 = getSubtask(2, 1);
+        Subtask subtask2 = getSubtask(3, 1);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask1);
@@ -58,65 +70,25 @@ public class EpicTest {
     //=================================================
     @Test
     public void shouldReturnEpicStartTime() {
-        Epic epic = new Epic(
-                1,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
-        Subtask subtask1 = new Subtask(
-                2,
-                TaskType.SUBTASK,
-                "Subtask1",
-                TaskStatus.NEW,
-                "Subtask1 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00),
-                1);
-        Subtask subtask2 = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
-                1);
+        Epic epic = getEpic(1);
+        Subtask subtask1 = getSubtask(2, 1);
+        Subtask subtask2 = getSubtask(3, 1);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
 
-        assertEquals(LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00),
+        assertEquals(LocalDateTime.of(2022, Month.NOVEMBER, 22, 18, 00),
                 manager.getEpics().get(1).getEpicStartTime());
     }
     //=================================================
     @Test
     public void shouldReturnEpicEndTime() {
-        Epic epic = new Epic(
-                1,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
-        Subtask subtask1 = new Subtask(
-                2,
-                TaskType.SUBTASK,
-                "Subtask1",
-                TaskStatus.NEW,
-                "Subtask1 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00),
-                1);
-        Subtask subtask2 = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
-                1);
+        Epic epic = getEpic(1);
+        Subtask subtask1 = getSubtask(2, 1);
+        subtask1.setStartTime(LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00));
+        Subtask subtask2 = getSubtask(3, 1);
+        subtask2.setStartTime(LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00));
 
         manager.addEpic(epic);
         manager.addSubtask(subtask1);
@@ -128,30 +100,9 @@ public class EpicTest {
     //=================================================
     @Test
     public void shouldGetSubtasks() {
-        Epic epic = new Epic(
-                1,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
-        Subtask subtask1 = new Subtask(
-                2,
-                TaskType.SUBTASK,
-                "Subtask1",
-                TaskStatus.NEW,
-                "Subtask1 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00),
-                1);
-        Subtask subtask2 = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
-                1);
+        Epic epic = getEpic(1);
+        Subtask subtask1 = getSubtask(2, 1);
+        Subtask subtask2 = getSubtask(3, 1);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask1);
@@ -164,39 +115,12 @@ public class EpicTest {
     //=================================================
     @Test
     public void shouldSetSubtask() {
-        Epic epic = new Epic(
-                1,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
-        Subtask subtask1 = new Subtask(
-                2,
-                TaskType.SUBTASK,
-                "Subtask1",
-                TaskStatus.NEW,
-                "Subtask1 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00),
-                1);
-        Subtask subtask2 = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
-                1);
-        Subtask subtask3 = new Subtask(
-                4,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00),
-                1);
+        Epic epic = getEpic(1);
+        Subtask subtask1 = getSubtask(2, 1);
+        Subtask subtask2 = getSubtask(3, 1);
+        subtask2.setStartTime(LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00));
+        Subtask subtask3 = getSubtask(4,1);
+        subtask3.setStartTime(LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00));
 
         manager.addEpic(epic);
         manager.addSubtask(subtask1);
@@ -209,30 +133,9 @@ public class EpicTest {
     //=================================================
     @Test
     public void shouldRemoveSubtask() {
-        Epic epic = new Epic(
-                1,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
-        Subtask subtask1 = new Subtask(
-                2,
-                TaskType.SUBTASK,
-                "Subtask1",
-                TaskStatus.NEW,
-                "Subtask1 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00),
-                1);
-        Subtask subtask2 = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
-                1);
+        Epic epic = getEpic(1);
+        Subtask subtask1 = getSubtask(2, 1);
+        Subtask subtask2 = getSubtask(3, 1);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask1);
@@ -246,30 +149,11 @@ public class EpicTest {
     // ГРАНИЧНЫЕ КЕЙСЫ.
     @Test
     public void shouldThrowExceptionWhenEpicDurationIs0orLess() {
-        Epic epic = new Epic(
-                1,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
-        Subtask subtask1 = new Subtask(
-                2,
-                TaskType.SUBTASK,
-                "Subtask1",
-                TaskStatus.NEW,
-                "Subtask1 description",
-                -1,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00),
-                1);
-        Subtask subtask2 = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                -1,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
-                1);
+        Epic epic = getEpic(1);
+        Subtask subtask1 = getSubtask(2, 1);
+        subtask1.setDuration(-1);
+        Subtask subtask2 = getSubtask(3, 1);
+        subtask2.setDuration(-1);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask1);
@@ -290,30 +174,11 @@ public class EpicTest {
     //=================================================
     @Test
     public void shouldThrowExceptionWhenEpicStartTimeIsNull() {
-        Epic epic = new Epic(
-                1,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
-        Subtask subtask1 = new Subtask(
-                2,
-                TaskType.SUBTASK,
-                "Subtask1",
-                TaskStatus.NEW,
-                "Subtask1 description",
-                30,
-                null,
-                1);
-        Subtask subtask2 = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                null,
-                1);
+        Epic epic = getEpic(1);
+        Subtask subtask1 = getSubtask(2, 1);
+        subtask1.setStartTime(null);
+        Subtask subtask2 = getSubtask(3, 1);
+        subtask2.setStartTime(null);
 
         manager.addEpic(epic);
 
@@ -333,30 +198,11 @@ public class EpicTest {
     //=================================================
     @Test
     public void shouldThrowExceptionWhenEpicEndTimeIsNull() {
-        Epic epic = new Epic(
-                1,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
-        Subtask subtask1 = new Subtask(
-                2,
-                TaskType.SUBTASK,
-                "Subtask1",
-                TaskStatus.NEW,
-                "Subtask1 description",
-                30,
-                null,
-                1);
-        Subtask subtask2 = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                null,
-                1);
+        Epic epic = getEpic(1);
+        Subtask subtask1 = getSubtask(2, 1);
+        subtask1.setStartTime(null);
+        Subtask subtask2 = getSubtask(3, 1);
+        subtask2.setStartTime(null);
 
         manager.addEpic(epic);
 
@@ -375,12 +221,7 @@ public class EpicTest {
     //=================================================
     @Test
     public void shouldReturn0WhenSubtasksMapIsEmpty() {
-        Epic epic = new Epic(
-                1,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
+        Epic epic = getEpic(1);
 
         manager.addEpic(epic);
 
@@ -389,30 +230,9 @@ public class EpicTest {
     //=================================================
     @Test
     public void shouldThrowExceptionWhenRemoveSubtaskIsNull() {
-        Epic epic = new Epic(
-                1,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
-        Subtask subtask1 = new Subtask(
-                2,
-                TaskType.SUBTASK,
-                "Subtask1",
-                TaskStatus.NEW,
-                "Subtask1 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00),
-                1);
-        Subtask subtask2 = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
-                1);
+        Epic epic = getEpic(1);
+        Subtask subtask1 = getSubtask(2, 1);
+        Subtask subtask2 = getSubtask(3, 1);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask1);

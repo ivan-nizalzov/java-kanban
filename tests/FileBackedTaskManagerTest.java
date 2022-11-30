@@ -14,42 +14,46 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         super(new FileBackedTaskManager(new File("resources/back-up.csv")));
     }
 
-    // СТАНДАРТНЫЕ КЕЙСЫ.
-    @Test
-    void shouldLoadFromFileTasksManager() {
-        Epic epic = new Epic(
-                1,
+    // Конструкторы
+    public Epic getEpic(int id) {
+        return new Epic(
+                id,
                 TaskType.EPIC,
                 "Epic",
                 TaskStatus.NEW,
                 "Epic description");
-        Subtask subtask1 = new Subtask(
-                2,
-                TaskType.SUBTASK,
-                "Subtask1",
+    }
+
+    public Task getTask(int id) {
+        return new Task(
+                id,
+                TaskType.TASK,
+                "Task",
                 TaskStatus.NEW,
-                "Subtask1 description",
+                "Task description",
                 30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00),
-                1);
-        Subtask subtask2 = new Subtask(
-                3,
+                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00));
+    }
+
+    public Subtask getSubtask(int idSubtask, int idEpic) {
+        return new Subtask(
+                idSubtask,
                 TaskType.SUBTASK,
-                "Subtask2",
+                "Subtask",
                 TaskStatus.NEW,
-                "Subtask2 description",
+                "Subtask description",
                 30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
-                1);
-        Subtask subtask3 = new Subtask(
-                4,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00),
-                1);
+                LocalDateTime.of(2022, Month.NOVEMBER, 22, 18, 00),
+                idEpic);
+    }
+
+    // СТАНДАРТНЫЕ КЕЙСЫ.
+    @Test
+    void shouldLoadFromFileTasksManager() {
+        Epic epic = getEpic(1);
+        Subtask subtask1 = getSubtask(2, 1);
+        Subtask subtask2 = getSubtask(3, 1);
+        Subtask subtask3 = getSubtask(4, 1);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask1);
@@ -85,47 +89,11 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     // Эпик без подзадач
     @Test
     void shouldLoadFromFileTasksManagerWithEpicWithoutSubtasks() {
-        Epic epic = new Epic(
-                1,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
-        Subtask subtask1 = new Subtask(
-                2,
-                TaskType.SUBTASK,
-                "Subtask1",
-                TaskStatus.NEW,
-                "Subtask1 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00),
-                1);
-        Subtask subtask2 = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
-                1);
-        Subtask subtask3 = new Subtask(
-                4,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00),
-                1);
-        Task task = new Task(
-                5,
-                TaskType.TASK,
-                "Task",
-                TaskStatus.NEW,
-                "Task description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00));
+        Epic epic = getEpic(1);
+        Subtask subtask1 = getSubtask(2, 1);
+        Subtask subtask2 = getSubtask(3, 1);
+        Subtask subtask3 = getSubtask(4, 1);
+        Task task = getTask(5);
 
         manager.addEpic(epic);
         manager.addTask(task);
@@ -143,39 +111,10 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     // Пустой список истории
     @Test
     void shouldLoadFromFileTasksManagerWithEmptyHistory() {
-        Epic epic = new Epic(
-                1,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
-        Subtask subtask1 = new Subtask(
-                2,
-                TaskType.SUBTASK,
-                "Subtask1",
-                TaskStatus.NEW,
-                "Subtask1 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 20, 00),
-                1);
-        Subtask subtask2 = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 22, 00),
-                1);
-        Subtask subtask3 = new Subtask(
-                4,
-                TaskType.SUBTASK,
-                "Subtask2",
-                TaskStatus.NEW,
-                "Subtask2 description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00),
-                1);
+        Epic epic = getEpic(1);
+        Subtask subtask1 = getSubtask(2, 1);
+        Subtask subtask2 = getSubtask(3, 1);
+        Subtask subtask3 = getSubtask(4, 1);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask1);
