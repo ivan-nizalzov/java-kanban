@@ -25,7 +25,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     }
 
-    private void save() {
+    // Для хранения всех задач. Используется в HttpTaskManager
+    public Map<Integer, Task> allTasks = new HashMap<>();
+
+    public void save() {
         try {
             FileWriter fileWriter = new FileWriter("resources/back-up.csv");
             final String head = "id,type,name,status,description,duration,startTime,epic" + System.lineSeparator();

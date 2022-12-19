@@ -1,4 +1,6 @@
 id,type,name,status,description,duration,startTime,epic
-5,TASK,Task,NEW,Task description,30,2022-11-21T18:00
-1,EPIC,Epic,NEW,Epic description,0,null
+1,EPIC,Epic,NEW,Epic description,90,2022-11-22T18:00
+2,SUBTASK,Subtask,NEW,Subtask description,30,2022-11-22T18:00,1
+3,SUBTASK,Subtask,NEW,Subtask description,30,2022-11-22T18:00,1
+4,SUBTASK,Subtask,NEW,Subtask description,30,2022-11-22T18:00,1
 
