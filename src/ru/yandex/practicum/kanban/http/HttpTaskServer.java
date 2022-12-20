@@ -34,11 +34,12 @@ public class HttpTaskServer {
     public void start() {
         httpServer.start();
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
+        System.out.println("http://localhost:" + PORT + "/tasks");
     }
 
     public void stop() {
         httpServer.stop(0);
-        System.out.println("HTTP-сервер остановлен!");
+        System.out.println("HTTP-сервер остановлен на " + PORT + " порту!");
     }
 
     public static class TasksHandler implements HttpHandler {

@@ -44,15 +44,16 @@ public class KVServer {
                     h.sendResponseHeaders(400, 0);
                     return;
                 }
-                String response = data.get(key);
-                if (response.isEmpty()) {
-                    System.out.println("Value для получения пустой. Value указывается в теле запроса");
-                    h.sendResponseHeaders(400, 0);
+                if (!data.containsKey(key)) {
+                    System.out.println("Не могу достать данные для ключа " + key + ", данные отсутствуют.");
+                    h.sendResponseHeaders(404, 0);
                     return;
                 }
-                try (OutputStream os = h.getResponseBody()) {
-                    os.write(response.getBytes());
-                }
+                sendText(h, data.get(key));
+                System.out.println("Значения для ключа " + key + " успешно отправлено в ответ на запрос!");
+                h.sendResponseHeaders(200, 0);
+            } else {
+                System.out.println("/load ждет GET-запрос, а получил: " + h.getRequestMethod());
             }
         } finally {
             h.close();
