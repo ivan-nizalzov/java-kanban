@@ -3,7 +3,6 @@ package ru.yandex.practicum.kanban.http;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;

@@ -1,5 +1,7 @@
 package ru.yandex.practicum.kanban.http;
 
+import ru.yandex.practicum.kanban.exception.ManagerSaveException;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -7,70 +9,63 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class KVTaskClient {
-    protected URI url;
+    private final String url;
     protected String API_TOKEN;
     HttpClient client = HttpClient.newHttpClient();
 
-    public KVTaskClient(String path) {
-        this.url = URI.create(path);
+    public KVTaskClient(int port) {
+        url = "http://localhost:" + port + "/";
+        API_TOKEN = register(url);
     }
 
-    public String register() {
-        URI url = URI.create(this.url + "/register");
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .GET()
-                .build();
+    private String register(String url) {
         try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url + "register"))
+                    .GET()
+                    .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                return API_TOKEN = response.body();
-            } else {
-                System.out.println("Не удалось получить API_TOKEN");
+            if (response.statusCode() != 200) {
+                throw new ManagerSaveException("Can't do save request. Status code: " + response.statusCode());
+            }
+            return response.body();
+        } catch (IOException | InterruptedException e) {
+            throw new ManagerSaveException("Can't do save request.");
+        }
+    }
+
+    public void put(String key, String value) {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url + "save/" + key + "?API_TOKEN=" + API_TOKEN))
+                    .POST(HttpRequest.BodyPublishers.ofString(value))
+                    .build();
+            HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
+            if (response.statusCode() != 200) {
+                throw new ManagerSaveException("Can't do save request. Status code: " + response.statusCode());
             }
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
-        }
-        return "Некорректный API_TOKEN";
-    }
-
-
-    public void put(String key, String json)  {
-        if (API_TOKEN == null) {
-            System.out.println("API_TOKEN не присвоен.");
-            return;
-        }
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url + "/save" + key + "?API_TOKEN=" + API_TOKEN))
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response.statusCode());
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
+            throw new ManagerSaveException("Can't do save request.");
         }
     }
 
     public String load(String key) {
-        if (API_TOKEN == null) {
-            return "API_TOKEN не присвоен.";
-        }
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url + "/load" + key + "?API_TOKEN=" + API_TOKEN))
-                .GET()
-                .build();
         try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url + "load/" + key + "?API_TOKEN=" + API_TOKEN))
+                    .GET()
+                    .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response.statusCode());
+            if (response.statusCode() != 200) {
+                throw new ManagerSaveException("Can't do save request. Status code: " + response.statusCode());
+            }
             return response.body();
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
+            throw new ManagerSaveException("Can't do save request.");
         }
-        return "Произошла ошибка при получении запроса.";
-    }
 
+    }
 }

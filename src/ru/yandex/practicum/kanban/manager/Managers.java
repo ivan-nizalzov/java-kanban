@@ -6,8 +6,9 @@ import ru.yandex.practicum.kanban.history.HistoryManager;
 import ru.yandex.practicum.kanban.history.InMemoryHistoryManager;
 import ru.yandex.practicum.kanban.adapter.LocalDateAdapter;
 import ru.yandex.practicum.kanban.http.HttpTaskManager;
+import ru.yandex.practicum.kanban.http.KVServer;
 
-import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 public class Managers {
@@ -30,9 +31,13 @@ public class Managers {
         return gsonBuilder.create();
     }
 
+    public static KVServer getDefaultKVServer() throws IOException {
+        final KVServer kvServer = new KVServer();
+        kvServer.start();
+        return kvServer;
+    }
+
     public static HttpTaskManager getDefault() {
-        HttpTaskManager httpTaskManager = new HttpTaskManager("http://localhost:8078");
-        FileBackedTaskManager.loadFromLife(new File("resources/back-up.csv"));
-        return httpTaskManager;
+        return new HttpTaskManager(KVServer.PORT);
     }
 }

@@ -1,132 +1,92 @@
 package ru.yandex.practicum.kanban.http;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import ru.yandex.practicum.kanban.adapter.LocalDateAdapter;
 import ru.yandex.practicum.kanban.manager.FileBackedTaskManager;
 import ru.yandex.practicum.kanban.manager.Managers;
 import ru.yandex.practicum.kanban.tasks.Epic;
 import ru.yandex.practicum.kanban.tasks.Subtask;
 import ru.yandex.practicum.kanban.tasks.Task;
+import ru.yandex.practicum.kanban.tasks.TaskType;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class HttpTaskManager extends FileBackedTaskManager {
-    private final Gson gson = Managers.getGson();
-    protected KVTaskClient kvTaskClient;
-    protected String path;
+    private final Gson gson;
+    private final KVTaskClient client;
 
-    public HttpTaskManager(String path) {
-        this.path = path;
+    public HttpTaskManager(int port) {
+        this(port, false);
     }
 
-    public void getToken() {
-        kvTaskClient = new KVTaskClient(path);
-        kvTaskClient.register();
+    public HttpTaskManager(int port, boolean load) {
+        super(null);
+        gson = Managers.getGson();
+        client = new KVTaskClient(port);
+        if (load) {
+            load();
+        }
     }
 
-    public void saveTasks() throws IOException {
-        if (kvTaskClient == null) {
-            System.out.println("Требуется регистрация");
-            return;
-        }
+    protected void addTasks(List<? extends Task> tasks) {
+        for (Task task : tasks) {
+            final int id = task.getId();
+            TaskType type = task.getTaskType();
 
-        FileBackedTaskManager.loadFromLife(new File("resources/back-up.csv"));
-
-        kvTaskClient.put("/tasks", gson.toJson(getTasks().values()));
-        kvTaskClient.put("/epics", gson.toJson(getEpics().values()));
-        kvTaskClient.put("/subtasks", gson.toJson(getSubtasks().values()));
-        kvTaskClient.put("/history", gson.toJson(getHistory()));
-    }
-
-    public void loadTasks() {
-        String json = kvTaskClient.load("/tasks");
-        Type type = new TypeToken<ArrayList<Task>>(){}.getType();
-        ArrayList<Task> tasksList = gson.fromJson(json, type);
-        for (Task task : tasksList) {
-            addTaskFromKVServer(task);
-        }
-        allTasks.putAll(getTasks());
-
-        json = kvTaskClient.load("/epics");
-        type = new TypeToken<ArrayList<Epic>>(){}.getType();
-        ArrayList<Epic> epicsList = gson.fromJson(json, type);
-        for (Epic epic : epicsList) {
-            addEpicFromKVServer(epic);
-        }
-        allTasks.putAll(getEpics());
-
-        json = kvTaskClient.load("/subtasks");
-        type = new TypeToken<ArrayList<Subtask>>(){}.getType();
-        ArrayList<Subtask> subtasksList = gson.fromJson(json, type);
-        for (Subtask subtask : subtasksList) {
-            addSubtaskFromKVServer(subtask);
-        }
-        allTasks.putAll(getSubtasks());
-
-        json = kvTaskClient.load("/history");
-        String historyLine = json.substring(1, json.length() - 1);
-        if (!historyLine.equals("\"\"")) {
-            String[] historyLineContents = historyLine.split(",");
-            for (String s : historyLineContents) {
-                historyManager.addHistory(allTasks.get(Integer.parseInt(s)));
+            if (type == TaskType.TASK) {
+                this.tasks.put(id, task);
+                prioritizedTasks.add(task);
+            } else if (type == TaskType.SUBTASK) {
+                subtasks.put(id, (Subtask) task);
+                prioritizedTasks.add(task);
+            } else if (type == TaskType.EPIC) {
+                epics.put(id, (Epic) task);
             }
         }
-        save();
     }
 
-    public int addTaskFromKVServer(Task task) {
-        task.setId(task.getId());
-        prioritizedTasks.add(task);
-        tasks.put(task.getId(), task);
-        save();
-        return task.getId();
-    }
+    private void load() {
+        ArrayList<Task> tasks = gson.fromJson(client.load("tasks"), new TypeToken<ArrayList<Task>>() {
+        }.getType());
+        addTasks(tasks);
 
-    public int addEpicFromKVServer(Epic epic) {
-        epic.setId(epic.getId());
-        prioritizedTasks.add(epic);
-        epics.put(epic.getId(), epic);
-        save();
-        return epic.getId();
-    }
+        ArrayList<Epic> epics = gson.fromJson(client.load("epics"), new TypeToken<ArrayList<Epic>>() {
+        }.getType());
+        addTasks(epics);
 
-    public int addSubtaskFromKVServer(Subtask subtask) {
-        subtask.setId(subtask.getId());
-        prioritizedTasks.add(subtask);
-        subtasks.put(subtask.getId(), subtask);
-        save();
-        return subtask.getId();
+        ArrayList<Subtask> subtasks = gson.fromJson(client.load("subtasks"), new TypeToken<ArrayList<Subtask>>() {
+        }.getType());
+        addTasks(subtasks);
+
+        ArrayList<Task> history = gson.fromJson(client.load("history"), new TypeToken<ArrayList<Task>>() {
+        }.getType());
+        for (Task task : history) {
+            historyManager.addHistory(task);
+        }
     }
 
     @Override
-    public void addTask(Task task) {
-        task.setId(task.getId());
-        task.getStartTime();
-        prioritizedTasks.add(task);
-        tasks.put(task.getId(), task);
-        save();
+    public void save() {
+        String jsonTasks = gson.toJson(new ArrayList<>(tasks.values()));
+        client.put("tasks", jsonTasks);
+
+        String jsonSubtasks = gson.toJson(new ArrayList<>(subtasks.values()));
+        client.put("subtasks", jsonSubtasks);
+
+        String jsonEpics = gson.toJson(new ArrayList<>(epics.values()));
+        client.put("epics", jsonEpics);
+
+        String jsonHistory = gson.toJson(historyManager.getHistory()
+                .stream()
+                .map(Task::getId)
+                .collect(Collectors.toList()));
+        client.put("history", jsonHistory);
     }
 
-    @Override
-    public void addEpic(Epic epic) {
-        epic.setId(epic.getId());
-        prioritizedTasks.add(epic);
-        epics.put(epic.getId(), epic);
-        save();
-    }
-
-    @Override
-    public void addSubtask(Subtask subtask) {
-        subtask.setId(subtask.getId());
-        subtask.getStartTime();
-        prioritizedTasks.add(subtask);
-        subtasks.put(subtask.getId(), subtask);
-        save();
-    }
+    /*public void getToken() {
+        kvTaskClient = new KVTaskClient(8078);
+        kvTaskClient.register();
+    }*/
 }

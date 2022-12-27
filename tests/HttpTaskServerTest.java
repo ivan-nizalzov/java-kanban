@@ -1,8 +1,6 @@
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.junit.jupiter.api.*;
-import ru.yandex.practicum.kanban.adapter.LocalDateAdapter;
 import ru.yandex.practicum.kanban.http.HttpTaskManager;
 import ru.yandex.practicum.kanban.http.HttpTaskServer;
 import ru.yandex.practicum.kanban.http.KVServer;
@@ -25,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class HttpTaskServerTest {
     HttpTaskServer httpTaskServer;
     HttpTaskManager httpTaskManager;
-    HttpTaskManager loadedTaskManager;
     HttpClient httpClient = HttpClient.newHttpClient();
     KVServer kvServer;
     String path = "http://localhost:8080";
@@ -33,7 +30,7 @@ class HttpTaskServerTest {
 
     @BeforeAll
     static void shouldCreateFileForeTests() {
-        var manager = Managers.getDefault();
+        HttpTaskManager manager = Managers.getDefault();
 
         Task task = new Task(
                 1,
@@ -76,8 +73,6 @@ class HttpTaskServerTest {
         httpTaskServer = new HttpTaskServer();
         httpTaskServer.start();
         httpTaskManager = Managers.getDefault();
-        httpTaskManager.getToken();
-        httpTaskManager.saveTasks();
     }
 
     @AfterEach
@@ -97,7 +92,8 @@ class HttpTaskServerTest {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             assertEquals(200, response.statusCode());
             String json = response.body();
-            Type type = new TypeToken<ArrayList<Task>>(){}.getType();
+            Type type = new TypeToken<ArrayList<Task>>() {
+            }.getType();
             List<Task> tasksList = gson.fromJson(json, type);
             List<Task> expectedList = new ArrayList<>(httpTaskManager.getTasks().values());
             for (int i = 0; i < tasksList.size(); i++) {
@@ -120,7 +116,8 @@ class HttpTaskServerTest {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             assertEquals(200, response.statusCode());
             String json = response.body();
-            Type type = new TypeToken<ArrayList<Epic>>(){}.getType();
+            Type type = new TypeToken<ArrayList<Epic>>() {
+            }.getType();
             List<Epic> tasksList = gson.fromJson(json, type);
             List<Epic> expectedList = new ArrayList<>(httpTaskManager.getEpics().values());
             for (int i = 0; i < tasksList.size(); i++) {
@@ -143,7 +140,8 @@ class HttpTaskServerTest {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             assertEquals(200, response.statusCode());
             String json = response.body();
-            Type type = new TypeToken<ArrayList<Subtask>>(){}.getType();
+            Type type = new TypeToken<ArrayList<Subtask>>() {
+            }.getType();
             List<Subtask> tasksList = gson.fromJson(json, type);
             List<Subtask> expectedList = new ArrayList<>(httpTaskManager.getSubtasks().values());
             for (int i = 0; i < tasksList.size(); i++) {
@@ -180,7 +178,7 @@ class HttpTaskServerTest {
 
     @Test
     void shouldGetSubtaskById() {
-        URI url = URI.create(path + "/tasks/subtask?id=5");
+        URI url = URI.create(path + "/tasks/subtask?id=3");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .GET()
@@ -191,7 +189,7 @@ class HttpTaskServerTest {
             assertEquals(200, response.statusCode());
             String json = response.body();
             Subtask subtask = gson.fromJson(json, Subtask.class);
-            Subtask expectedSubtask = httpTaskManager.getSubtasks().get(5);
+            Subtask expectedSubtask = httpTaskManager.getSubtasks().get(3);
 
             assertEquals(expectedSubtask.getTaskName(), subtask.getTaskName());
         } catch (IOException | InterruptedException e) {
@@ -213,7 +211,8 @@ class HttpTaskServerTest {
             assertEquals(200, response.statusCode());
 
             String json = response.body();
-            Type type = new TypeToken<ArrayList<Task>>(){}.getType();
+            Type type = new TypeToken<ArrayList<Task>>() {
+            }.getType();
             List<Task> historyList = gson.fromJson(json, type);
             List<Task> expectedHistoryList = new ArrayList<>(httpTaskManager.getHistory());
             for (int i = 0; i < historyList.size(); i++) {
@@ -238,7 +237,8 @@ class HttpTaskServerTest {
             assertEquals(200, response.statusCode());
 
             String json = response.body();
-            Type type = new TypeToken<List<Task>>(){}.getType();
+            Type type = new TypeToken<List<Task>>() {
+            }.getType();
             List<Task> prioritizedList = gson.fromJson(json, type);
             List<Task> expectedPrioritizedList = new ArrayList<>(httpTaskManager.getPrioritizedTasks());
             for (int i = 0; i < prioritizedList.size(); i++) {
@@ -253,7 +253,7 @@ class HttpTaskServerTest {
     @Test
     void shouldDeleteTaskByIdFromServer() {
         HttpTaskManager rollback = Managers.getDefault();
-        URI url = URI.create(path + "/tasks/task?id=2");
+        URI url = URI.create(path + "/tasks/task?id=1");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .DELETE()
@@ -273,7 +273,7 @@ class HttpTaskServerTest {
     @Test
     void shouldDeleteEpicByIdAndAllSubtasksByThisEpicFromServer() {
         HttpTaskManager rollback = Managers.getDefault();
-        URI url = URI.create(path + "/tasks/epic?id=3");
+        URI url = URI.create(path + "/tasks/epic?id=2");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .DELETE()
@@ -282,7 +282,7 @@ class HttpTaskServerTest {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             assertEquals(200, response.statusCode());
             httpTaskManager = Managers.getDefault();
-            assertNull(httpTaskManager.getEpicById(3));
+            assertNull(httpTaskManager.getEpicById(2));
             httpTaskManager = rollback;
         } catch (IOException | InterruptedException e) {
             System.out.println("Во время выполнения запроса возникла ошибка.\n" +
@@ -309,44 +309,4 @@ class HttpTaskServerTest {
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }
-
-    @AfterAll
-    static void shouldRestoreFile() {
-        var manager = Managers.getDefaultFileBackedManager();
-
-        Task task = new Task(
-                1,
-                TaskType.TASK,
-                "Task",
-                TaskStatus.NEW,
-                "Task description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 21, 18, 00));
-
-        Epic epic = new Epic(
-                2,
-                TaskType.EPIC,
-                "Epic",
-                TaskStatus.NEW,
-                "Epic description");
-
-        Subtask subtask = new Subtask(
-                3,
-                TaskType.SUBTASK,
-                "Subtask",
-                TaskStatus.NEW,
-                "Subtask description",
-                30,
-                LocalDateTime.of(2022, Month.NOVEMBER, 22, 18, 00),
-                2);
-
-        manager.addTask(task);
-        manager.addEpic(epic);
-        manager.addSubtask(subtask);
-
-        manager.getTaskById(1);
-        manager.getEpicById(2);
-    }
-
-
 }
