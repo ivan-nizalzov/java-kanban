@@ -1,5 +1,6 @@
 import org.junit.jupiter.api.*;
 import ru.yandex.practicum.kanban.http.HttpTaskManager;
+import ru.yandex.practicum.kanban.http.HttpTaskServer;
 import ru.yandex.practicum.kanban.http.KVServer;
 import ru.yandex.practicum.kanban.manager.Managers;
 import ru.yandex.practicum.kanban.tasks.*;
@@ -14,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class HttpTaskManagerTest {
     HttpTaskManager httpTaskManager;
     KVServer kvServer;
+    HttpTaskServer httpTaskServer;
 
     @BeforeAll
     static void shouldConstructTasksForTests() {
@@ -58,12 +60,15 @@ class HttpTaskManagerTest {
     void starServer() throws IOException {
         kvServer = new KVServer();
         kvServer.start();
+        httpTaskServer = new HttpTaskServer();
+        httpTaskServer.start();
         httpTaskManager = Managers.getDefault();
     }
 
     @AfterEach
     void stopStart() {
         kvServer.stop();
+        httpTaskServer.stop();
     }
 
     @Test

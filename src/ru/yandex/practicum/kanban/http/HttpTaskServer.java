@@ -22,7 +22,7 @@ public class HttpTaskServer {
     private final TaskManager taskManager;
 
     public HttpTaskServer() throws IOException {
-        this(Managers.getDefault());
+        this(Managers.getDefaultFileBackedManager());
     }
 
     public HttpTaskServer(TaskManager taskManager) throws IOException {

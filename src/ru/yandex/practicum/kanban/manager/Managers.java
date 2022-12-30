@@ -2,6 +2,7 @@ package ru.yandex.practicum.kanban.manager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import ru.yandex.practicum.kanban.adapter.LocalDateTimeSerializer;
 import ru.yandex.practicum.kanban.history.HistoryManager;
 import ru.yandex.practicum.kanban.history.InMemoryHistoryManager;
 import ru.yandex.practicum.kanban.adapter.LocalDateAdapter;
@@ -9,6 +10,7 @@ import ru.yandex.practicum.kanban.http.HttpTaskManager;
 import ru.yandex.practicum.kanban.http.KVServer;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Managers {
@@ -27,7 +29,8 @@ public class Managers {
 
     public static Gson getGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter());
+        //gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateAdapter());
+        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer());
         return gsonBuilder.create();
     }
 

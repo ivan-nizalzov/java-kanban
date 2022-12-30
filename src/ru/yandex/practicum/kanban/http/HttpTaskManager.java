@@ -84,9 +84,4 @@ public class HttpTaskManager extends FileBackedTaskManager {
                 .collect(Collectors.toList()));
         client.put("history", jsonHistory);
     }
-
-    /*public void getToken() {
-        kvTaskClient = new KVTaskClient(8078);
-        kvTaskClient.register();
-    }*/
 }
