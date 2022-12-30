@@ -2,9 +2,10 @@ import org.junit.jupiter.api.*;
 import ru.yandex.practicum.kanban.http.HttpTaskManager;
 import ru.yandex.practicum.kanban.http.HttpTaskServer;
 import ru.yandex.practicum.kanban.http.KVServer;
-import ru.yandex.practicum.kanban.manager.Managers;
+import ru.yandex.practicum.kanban.manager.FileBackedTaskManager;
 import ru.yandex.practicum.kanban.tasks.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -13,13 +14,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HttpTaskManagerTest {
-    HttpTaskManager httpTaskManager;
+    HttpTaskManager manager;
     KVServer kvServer;
     HttpTaskServer httpTaskServer;
 
     @BeforeAll
     static void shouldConstructTasksForTests() {
-        var httpTaskManager = Managers.getDefault();
+        FileBackedTaskManager manager = new FileBackedTaskManager(new File("resources/back-up.csv"));
 
         Task task = new Task(
                 1,
@@ -47,13 +48,13 @@ class HttpTaskManagerTest {
                 LocalDateTime.of(2022, Month.NOVEMBER, 22, 18, 00),
                 2);
 
-        httpTaskManager.addTask(task);
-        httpTaskManager.addEpic(epic);
-        httpTaskManager.addSubtask(subtask);
+        manager.addTask(task);
+        manager.addEpic(epic);
+        manager.addSubtask(subtask);
 
-        httpTaskManager.getTaskById(1);
-        httpTaskManager.getEpicById(2);
-        httpTaskManager.getSubtaskById(3);
+        manager.getTaskById(1);
+        manager.getEpicById(2);
+        manager.getSubtaskById(3);
     }
 
     @BeforeEach
@@ -62,7 +63,6 @@ class HttpTaskManagerTest {
         kvServer.start();
         httpTaskServer = new HttpTaskServer();
         httpTaskServer.start();
-        httpTaskManager = Managers.getDefault();
     }
 
     @AfterEach

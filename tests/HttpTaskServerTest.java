@@ -4,9 +4,11 @@ import org.junit.jupiter.api.*;
 import ru.yandex.practicum.kanban.http.HttpTaskManager;
 import ru.yandex.practicum.kanban.http.HttpTaskServer;
 import ru.yandex.practicum.kanban.http.KVServer;
+import ru.yandex.practicum.kanban.manager.FileBackedTaskManager;
 import ru.yandex.practicum.kanban.manager.Managers;
 import ru.yandex.practicum.kanban.tasks.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -30,7 +32,7 @@ class HttpTaskServerTest {
 
     @BeforeAll
     static void shouldCreateFileForeTests() {
-        HttpTaskManager manager = Managers.getDefault();
+        FileBackedTaskManager manager = new FileBackedTaskManager(new File("resources/back-up.csv"));
 
         Task task = new Task(
                 1,
