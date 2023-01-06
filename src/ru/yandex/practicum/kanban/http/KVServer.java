@@ -32,27 +32,21 @@ public class KVServer {
         try {
             System.out.println("\n/load");
             if (!hasAuth(h)) {
-                System.out.println("Запрос не авторизован. Необходим параметр в query API_TOKEN со значением API - key.");
+                System.out.println("Запрос не авторизован. Необходим параметр в query API_TOKEN со значением API-key.");
                 h.sendResponseHeaders(403, 0);
                 return;
             }
             if ("GET".equals(h.getRequestMethod())) {
                 String key = h.getRequestURI().getPath().substring("/load/".length());
                 if (key.isEmpty()) {
-                    System.out.println("Key для загрузки пустой. Key указывается в пути: /load/{key}");
+                    System.out.println("Key для загрузки пустой. Key указывается в пути: /save/{key}");
                     h.sendResponseHeaders(400, 0);
                     return;
                 }
-                if (!data.containsKey(key)) {
-                    System.out.println("Не могу достать данные для ключа " + key + ", данные отсутствуют.");
-                    h.sendResponseHeaders(404, 0);
-                    return;
-                }
                 sendText(h, data.get(key));
-                System.out.println("Значения для ключа " + key + " успешно отправлено в ответ на запрос!");
-                h.sendResponseHeaders(200, 0);
             } else {
                 System.out.println("/load ждет GET-запрос, а получил: " + h.getRequestMethod());
+                h.sendResponseHeaders(405, 0);
             }
         } finally {
             h.close();
@@ -107,7 +101,7 @@ public class KVServer {
     }
 
     public void start() {
-        System.out.println("Запускаем сервер на порту " + PORT);
+        System.out.println("Запускаем сервер KVServer на порту " + PORT);
         System.out.println("Открой в браузере http://localhost:" + PORT + "/");
         System.out.println("API_TOKEN: " + API_TOKEN);
         System.out.println();
@@ -115,7 +109,7 @@ public class KVServer {
     }
 
     public void stop() {
-        System.out.println("Сервер остановлен.");
+        System.out.println("Сервер KVServer остановлен.");
         server.stop(0);
     }
 

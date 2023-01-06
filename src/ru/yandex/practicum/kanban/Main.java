@@ -1,12 +1,12 @@
-package ru.yandex.practicum.kanban.main;
+package ru.yandex.practicum.kanban;
 
 import ru.yandex.practicum.kanban.http.HttpTaskServer;
 import ru.yandex.practicum.kanban.http.KVServer;
-import ru.yandex.practicum.kanban.manager.FileBackedTaskManager;
 import ru.yandex.practicum.kanban.manager.InMemoryTaskManager;
+import ru.yandex.practicum.kanban.manager.Managers;
+import ru.yandex.practicum.kanban.manager.TaskManager;
 import ru.yandex.practicum.kanban.tasks.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -15,15 +15,14 @@ public class Main {
     public static void main(String[] args) throws IOException {
         HttpTaskServer httpTaskServer;
         KVServer kvServer;
+        TaskManager manager = Managers.getDefaultFileBackedManager();
 
         // Запуск сервера:
         kvServer = new KVServer();
         kvServer.start();
-        httpTaskServer = new HttpTaskServer();
+        httpTaskServer = new HttpTaskServer(manager);
         httpTaskServer.start();
 
-        //Создание менеджера fileBackedManager
-        FileBackedTaskManager manager = new FileBackedTaskManager(new File("resources/back-up.csv"));
         int id = InMemoryTaskManager.getIdCounter();
 
         Task task1 = new Task(

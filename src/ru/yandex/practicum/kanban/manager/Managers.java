@@ -29,8 +29,6 @@ public class Managers {
 
     public static Gson getGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
-        //gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateAdapter());
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer());
         return gsonBuilder.create();
     }
 

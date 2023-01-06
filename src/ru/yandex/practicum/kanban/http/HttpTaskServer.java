@@ -32,12 +32,6 @@ public class HttpTaskServer {
         httpServer.createContext("/tasks", this::handler);
     }
 
-    public static void main(String[] args) throws IOException {
-        final HttpTaskServer httpTaskServer = new HttpTaskServer();
-        httpTaskServer.start();
-        //httpTaskServer.stop();
-    }
-
     private void handler(HttpExchange h) {
         try (h) {
             System.out.println("\n/tasks: " + h.getRequestURI());
@@ -235,13 +229,13 @@ public class HttpTaskServer {
     }
 
     public void start() {
-        System.out.println("Запускаем сервер на порту " + PORT);
+        System.out.println("Запускаем сервер для HttpTaskServer на порту " + PORT);
         System.out.println("Открой в браузере http://localhost:" + PORT + "/");
         httpServer.start();
     }
 
     public void stop() {
-        System.out.println("Сервер остановлен.");
+        System.out.println("Сервер HttpTaskServer остановлен.");
         httpServer.stop(0);
     }
 

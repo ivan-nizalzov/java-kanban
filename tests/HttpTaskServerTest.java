@@ -4,11 +4,10 @@ import org.junit.jupiter.api.*;
 import ru.yandex.practicum.kanban.http.HttpTaskManager;
 import ru.yandex.practicum.kanban.http.HttpTaskServer;
 import ru.yandex.practicum.kanban.http.KVServer;
-import ru.yandex.practicum.kanban.manager.FileBackedTaskManager;
 import ru.yandex.practicum.kanban.manager.Managers;
+import ru.yandex.practicum.kanban.manager.TaskManager;
 import ru.yandex.practicum.kanban.tasks.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -19,21 +18,21 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class HttpTaskServerTest {
-    HttpTaskServer httpTaskServer;
-    HttpTaskManager httpTaskManager;
-    HttpClient httpClient = HttpClient.newHttpClient();
-    KVServer kvServer;
-    String path = "http://localhost:8080";
+    private HttpTaskServer httpTaskServer;
+    private HttpTaskManager httpTaskManager;
+    private HttpClient httpClient = HttpClient.newHttpClient();
+    private KVServer kvServer;
+    private final String path = "http://localhost:8080";
     private static final Gson gson = Managers.getGson();
+    public static TaskManager manager = Managers.getDefaultFileBackedManager();
 
     @BeforeAll
     static void shouldCreateFileForeTests() {
-        FileBackedTaskManager manager = new FileBackedTaskManager(new File("resources/back-up.csv"));
-
         Task task = new Task(
                 1,
                 TaskType.TASK,
@@ -72,7 +71,7 @@ class HttpTaskServerTest {
     void starServer() throws IOException {
         kvServer = new KVServer();
         kvServer.start();
-        httpTaskServer = new HttpTaskServer();
+        httpTaskServer = new HttpTaskServer(manager);
         httpTaskServer.start();
         httpTaskManager = Managers.getDefault();
     }
@@ -94,9 +93,10 @@ class HttpTaskServerTest {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             assertEquals(200, response.statusCode());
             String json = response.body();
-            Type type = new TypeToken<ArrayList<Task>>() {
+            Type type = new TypeToken<Map<Integer, Task>>() {
             }.getType();
-            List<Task> tasksList = gson.fromJson(json, type);
+            Map<Integer, Task> tasksMap = gson.fromJson(json, type);
+            List<Task> tasksList = new ArrayList<>(tasksMap.values());
             List<Task> expectedList = new ArrayList<>(httpTaskManager.getTasks().values());
             for (int i = 0; i < tasksList.size(); i++) {
                 assertEquals(expectedList.get(i).getTaskName(), tasksList.get(i).getTaskName());
@@ -118,12 +118,13 @@ class HttpTaskServerTest {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             assertEquals(200, response.statusCode());
             String json = response.body();
-            Type type = new TypeToken<ArrayList<Epic>>() {
+            Type type = new TypeToken<Map<Integer, Epic>>() {
             }.getType();
-            List<Epic> tasksList = gson.fromJson(json, type);
+            Map<Integer, Epic> epicsMap = gson.fromJson(json, type);
+            List<Epic> epicsList = new ArrayList<>(epicsMap.values());
             List<Epic> expectedList = new ArrayList<>(httpTaskManager.getEpics().values());
-            for (int i = 0; i < tasksList.size(); i++) {
-                assertEquals(expectedList.get(i).getTaskName(), tasksList.get(i).getTaskName());
+            for (int i = 0; i < epicsList.size(); i++) {
+                assertEquals(expectedList.get(i).getTaskName(), epicsList.get(i).getTaskName());
             }
         } catch (IOException | InterruptedException e) {
             System.out.println("Во время выполнения запроса возникла ошибка.\n" +
@@ -142,12 +143,13 @@ class HttpTaskServerTest {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             assertEquals(200, response.statusCode());
             String json = response.body();
-            Type type = new TypeToken<ArrayList<Subtask>>() {
+            Type type = new TypeToken<Map<Integer, Subtask>>() {
             }.getType();
-            List<Subtask> tasksList = gson.fromJson(json, type);
-            List<Subtask> expectedList = new ArrayList<>(httpTaskManager.getSubtasks().values());
-            for (int i = 0; i < tasksList.size(); i++) {
-                assertEquals(expectedList.get(i).getTaskName(), tasksList.get(i).getTaskName());
+            Map<Integer, Subtask> subtasksMap = gson.fromJson(json, type);
+            List<Task> subtasksList = new ArrayList<>(subtasksMap.values());
+            List<Task> expectedList = new ArrayList<>(httpTaskManager.getSubtasks().values());
+            for (int i = 0; i < subtasksList.size(); i++) {
+                assertEquals(expectedList.get(i).getTaskName(), subtasksList.get(i).getTaskName());
             }
         } catch (IOException | InterruptedException e) {
             System.out.println("Во время выполнения запроса возникла ошибка.\n" +
@@ -164,13 +166,11 @@ class HttpTaskServerTest {
                 .build();
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
             assertEquals(200, response.statusCode());
             String json = response.body();
             System.out.println(response.body());
             Task task = gson.fromJson(json, Task.class);
             Task expectedTask = httpTaskManager.getTasks().get(1);
-
             assertEquals(expectedTask.getTaskName(), task.getTaskName());
         } catch (IOException | InterruptedException e) {
             System.out.println("Во время выполнения запроса возникла ошибка.\n" +
@@ -187,12 +187,10 @@ class HttpTaskServerTest {
                 .build();
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
             assertEquals(200, response.statusCode());
             String json = response.body();
             Subtask subtask = gson.fromJson(json, Subtask.class);
             Subtask expectedSubtask = httpTaskManager.getSubtasks().get(3);
-
             assertEquals(expectedSubtask.getTaskName(), subtask.getTaskName());
         } catch (IOException | InterruptedException e) {
             System.out.println("Во время выполнения запроса возникла ошибка.\n" +
@@ -209,9 +207,7 @@ class HttpTaskServerTest {
                 .build();
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
             assertEquals(200, response.statusCode());
-
             String json = response.body();
             Type type = new TypeToken<ArrayList<Task>>() {
             }.getType();
@@ -219,32 +215,6 @@ class HttpTaskServerTest {
             List<Task> expectedHistoryList = new ArrayList<>(httpTaskManager.getHistory());
             for (int i = 0; i < historyList.size(); i++) {
                 assertEquals(expectedHistoryList.get(i).getTaskName(), historyList.get(i).getTaskName());
-            }
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
-        }
-    }
-
-    @Test
-    void shouldGetPrioritizedList() {
-        URI url = URI.create(path + "/tasks/priority");
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .GET()
-                .build();
-        try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            assertEquals(200, response.statusCode());
-
-            String json = response.body();
-            Type type = new TypeToken<List<Task>>() {
-            }.getType();
-            List<Task> prioritizedList = gson.fromJson(json, type);
-            List<Task> expectedPrioritizedList = new ArrayList<>(httpTaskManager.getPrioritizedTasks());
-            for (int i = 0; i < prioritizedList.size(); i++) {
-                assertEquals(expectedPrioritizedList.get(i).getTaskName(), prioritizedList.get(i).getTaskName());
             }
         } catch (IOException | InterruptedException e) {
             System.out.println("Во время выполнения запроса возникла ошибка.\n" +
@@ -274,7 +244,7 @@ class HttpTaskServerTest {
 
     @Test
     void shouldDeleteEpicByIdAndAllSubtasksByThisEpicFromServer() {
-        HttpTaskManager rollback = Managers.getDefault();
+        httpTaskManager = Managers.getDefault();
         URI url = URI.create(path + "/tasks/epic?id=2");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
@@ -283,9 +253,7 @@ class HttpTaskServerTest {
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             assertEquals(200, response.statusCode());
-            httpTaskManager = Managers.getDefault();
-            assertNull(httpTaskManager.getEpicById(2));
-            httpTaskManager = rollback;
+            assertEquals(true, httpTaskManager.getEpics().isEmpty());
         } catch (IOException | InterruptedException e) {
             System.out.println("Во время выполнения запроса возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");

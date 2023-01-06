@@ -9,8 +9,10 @@ import ru.yandex.practicum.kanban.tasks.Subtask;
 import ru.yandex.practicum.kanban.tasks.Task;
 import ru.yandex.practicum.kanban.tasks.TaskType;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class HttpTaskManager extends FileBackedTaskManager {
@@ -35,36 +37,70 @@ public class HttpTaskManager extends FileBackedTaskManager {
             final int id = task.getId();
             TaskType type = task.getTaskType();
 
-            if (type == TaskType.TASK) {
+            if (type.equals(TaskType.TASK)) {
                 this.tasks.put(id, task);
                 prioritizedTasks.add(task);
-            } else if (type == TaskType.SUBTASK) {
-                subtasks.put(id, (Subtask) task);
+            } else if (type.equals(TaskType.SUBTASK)) {
+                this.subtasks.put(id, (Subtask) task);
                 prioritizedTasks.add(task);
-            } else if (type == TaskType.EPIC) {
-                epics.put(id, (Epic) task);
+            } else if (type.equals(TaskType.EPIC)) {
+                this.epics.put(id, (Epic) task);
             }
         }
     }
 
     private void load() {
-        ArrayList<Task> tasks = gson.fromJson(client.load("tasks"), new TypeToken<ArrayList<Task>>() {
+        String json = client.load("tasks");
+        Type type = new TypeToken<Map<Integer, Task>>(){
+        }.getType();
+        Map<Integer, Task> tasksMap = gson.fromJson(json, type);
+        List<Task> tasksList = new ArrayList<>(tasksMap.values());
+        addTasks(tasksList);
+        //allTasks.putAll(getTasks());
+
+        json = client.load("epics");
+        type = new TypeToken<Map<Integer, Epic>>(){
+        }.getType();
+        Map<Integer, Epic> epicsMap = gson.fromJson(json, type);
+        List<Epic> epicsList = new ArrayList<>(epicsMap.values());
+        addTasks(epicsList);
+        //allTasks.putAll(getEpics());
+
+        json = client.load("subtasks");
+        type = new TypeToken<Map<Integer, Subtask>>(){
+        }.getType();
+        Map<Integer, Subtask> subtasksMap = gson.fromJson(json, type);
+        List<Subtask> subtasksList = new ArrayList<>(subtasksMap.values());
+        addTasks(subtasksList);
+        //allTasks.putAll(getSubtasks());
+
+        json = client.load("history");
+        String historyLine = json.substring(1, json.length() - 1);
+        if (!historyLine.equals("\"\"")) {
+            String[] historyLineContents = historyLine.split(",");
+            for (String s : historyLineContents) {
+                historyManager.addHistory(allTasks.get(Integer.parseInt(s)));
+            }
+        }
+        save();
+
+       /* ArrayList<Task> tasks = gson.fromJson(client.load("/tasks"), new TypeToken<ArrayList<Task>>() {
         }.getType());
         addTasks(tasks);
 
-        ArrayList<Epic> epics = gson.fromJson(client.load("epics"), new TypeToken<ArrayList<Epic>>() {
+        ArrayList<Epic> epics = gson.fromJson(client.load("/epics"), new TypeToken<ArrayList<Epic>>() {
         }.getType());
         addTasks(epics);
 
-        ArrayList<Subtask> subtasks = gson.fromJson(client.load("subtasks"), new TypeToken<ArrayList<Subtask>>() {
+        ArrayList<Subtask> subtasks = gson.fromJson(client.load("/subtasks"), new TypeToken<ArrayList<Subtask>>() {
         }.getType());
         addTasks(subtasks);
 
-        ArrayList<Task> history = gson.fromJson(client.load("history"), new TypeToken<ArrayList<Task>>() {
+        ArrayList<Task> history = gson.fromJson(client.load("/history"), new TypeToken<ArrayList<Task>>() {
         }.getType());
         for (Task task : history) {
             historyManager.addHistory(task);
-        }
+        }*/
     }
 
     @Override

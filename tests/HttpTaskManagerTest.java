@@ -2,10 +2,10 @@ import org.junit.jupiter.api.*;
 import ru.yandex.practicum.kanban.http.HttpTaskManager;
 import ru.yandex.practicum.kanban.http.HttpTaskServer;
 import ru.yandex.practicum.kanban.http.KVServer;
-import ru.yandex.practicum.kanban.manager.FileBackedTaskManager;
+import ru.yandex.practicum.kanban.manager.Managers;
+import ru.yandex.practicum.kanban.manager.TaskManager;
 import ru.yandex.practicum.kanban.tasks.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -14,14 +14,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HttpTaskManagerTest {
-    HttpTaskManager manager;
-    KVServer kvServer;
-    HttpTaskServer httpTaskServer;
+    public static TaskManager manager = Managers.getDefaultFileBackedManager();
+    private KVServer kvServer;
+    private HttpTaskServer httpTaskServer;
 
     @BeforeAll
     static void shouldConstructTasksForTests() {
-        FileBackedTaskManager manager = new FileBackedTaskManager(new File("resources/back-up.csv"));
-
         Task task = new Task(
                 1,
                 TaskType.TASK,
@@ -61,7 +59,7 @@ class HttpTaskManagerTest {
     void starServer() throws IOException {
         kvServer = new KVServer();
         kvServer.start();
-        httpTaskServer = new HttpTaskServer();
+        httpTaskServer = new HttpTaskServer(manager);
         httpTaskServer.start();
     }
 
@@ -72,7 +70,7 @@ class HttpTaskManagerTest {
     }
 
     @Test
-    public void shouldLoadFromHttpServer() {
+    public void shouldLoadFromKVServer() {
         HttpTaskManager taskManager = new HttpTaskManager(KVServer.PORT, true);
         final List<Task> tasks = taskManager.getTasks().values().stream().toList();
         assertNotNull(tasks, "Возвращает непустой список задач.");
@@ -88,6 +86,6 @@ class HttpTaskManagerTest {
 
         final List<Task> history= taskManager.getHistory();
         assertNotNull(history, "Возвращает непустой список истории.");
-        assertEquals(3, subtasks.size(), "Возвращает непустой список истории.");
+        assertEquals(3, history.size(), "Возвращает непустой список истории.");
     }
 }
