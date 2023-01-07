@@ -68,16 +68,17 @@ class HttpTaskServerTest {
     }
 
     @BeforeEach
-    void starServer() throws IOException {
+    void startServer() throws IOException {
         kvServer = new KVServer();
         kvServer.start();
+        manager = Managers.getDefaultFileBackedManager();
         httpTaskServer = new HttpTaskServer(manager);
         httpTaskServer.start();
         httpTaskManager = Managers.getDefault();
     }
 
     @AfterEach
-    void stopStart() {
+    void stopStartServer() {
         httpTaskServer.stop();
         kvServer.stop();
     }

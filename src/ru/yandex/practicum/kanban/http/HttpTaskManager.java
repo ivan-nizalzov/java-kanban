@@ -1,7 +1,6 @@
 package ru.yandex.practicum.kanban.http;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import ru.yandex.practicum.kanban.manager.FileBackedTaskManager;
 import ru.yandex.practicum.kanban.manager.Managers;
 import ru.yandex.practicum.kanban.tasks.Epic;
@@ -9,10 +8,9 @@ import ru.yandex.practicum.kanban.tasks.Subtask;
 import ru.yandex.practicum.kanban.tasks.Task;
 import ru.yandex.practicum.kanban.tasks.TaskType;
 
-import java.lang.reflect.Type;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class HttpTaskManager extends FileBackedTaskManager {
@@ -51,28 +49,17 @@ public class HttpTaskManager extends FileBackedTaskManager {
 
     private void load() {
         String json = client.load("tasks");
-        Type type = new TypeToken<Map<Integer, Task>>(){
-        }.getType();
-        Map<Integer, Task> tasksMap = gson.fromJson(json, type);
-        List<Task> tasksList = new ArrayList<>(tasksMap.values());
+        List<Task> tasksList = JsonConverter.convertJsonToTaskList(json);
         addTasks(tasksList);
-        //allTasks.putAll(getTasks());
 
         json = client.load("epics");
-        type = new TypeToken<Map<Integer, Epic>>(){
-        }.getType();
-        Map<Integer, Epic> epicsMap = gson.fromJson(json, type);
-        List<Epic> epicsList = new ArrayList<>(epicsMap.values());
+        List<Epic> epicsList = JsonConverter.convertJsonToEpicList(json);
         addTasks(epicsList);
-        //allTasks.putAll(getEpics());
+
 
         json = client.load("subtasks");
-        type = new TypeToken<Map<Integer, Subtask>>(){
-        }.getType();
-        Map<Integer, Subtask> subtasksMap = gson.fromJson(json, type);
-        List<Subtask> subtasksList = new ArrayList<>(subtasksMap.values());
+        List<Subtask> subtasksList = JsonConverter.convertJsonToSubtaskList(json);
         addTasks(subtasksList);
-        //allTasks.putAll(getSubtasks());
 
         json = client.load("history");
         String historyLine = json.substring(1, json.length() - 1);
@@ -82,29 +69,11 @@ public class HttpTaskManager extends FileBackedTaskManager {
                 historyManager.addHistory(allTasks.get(Integer.parseInt(s)));
             }
         }
-        save();
-
-       /* ArrayList<Task> tasks = gson.fromJson(client.load("/tasks"), new TypeToken<ArrayList<Task>>() {
-        }.getType());
-        addTasks(tasks);
-
-        ArrayList<Epic> epics = gson.fromJson(client.load("/epics"), new TypeToken<ArrayList<Epic>>() {
-        }.getType());
-        addTasks(epics);
-
-        ArrayList<Subtask> subtasks = gson.fromJson(client.load("/subtasks"), new TypeToken<ArrayList<Subtask>>() {
-        }.getType());
-        addTasks(subtasks);
-
-        ArrayList<Task> history = gson.fromJson(client.load("/history"), new TypeToken<ArrayList<Task>>() {
-        }.getType());
-        for (Task task : history) {
-            historyManager.addHistory(task);
-        }*/
     }
 
-    @Override
-    public void save() {
+    public void saveTasksToKVServer() {
+        FileBackedTaskManager.loadFromLife(new File("resources/back-up.csv"));
+
         String jsonTasks = gson.toJson(new ArrayList<>(tasks.values()));
         client.put("tasks", jsonTasks);
 

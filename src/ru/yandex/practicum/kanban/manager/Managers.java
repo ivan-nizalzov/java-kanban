@@ -1,7 +1,6 @@
 package ru.yandex.practicum.kanban.manager;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import ru.yandex.practicum.kanban.adapter.LocalDateTimeSerializer;
 import ru.yandex.practicum.kanban.history.HistoryManager;
 import ru.yandex.practicum.kanban.history.InMemoryHistoryManager;
@@ -12,6 +11,7 @@ import ru.yandex.practicum.kanban.http.KVServer;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Managers {
 
@@ -28,8 +28,19 @@ public class Managers {
     }
 
     public static Gson getGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        return gsonBuilder.create();
+        /*return new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
+                .serializeNulls()
+                .create();*/
+        return new GsonBuilder()
+        .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (value, type, context) ->
+                new JsonPrimitive(value.format(DateTimeFormatter.ISO_DATE_TIME)))
+                .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (jsonElement, type, context) ->
+                        LocalDateTime.parse(jsonElement.getAsJsonPrimitive()
+                                .getAsString(), DateTimeFormatter.ISO_DATE_TIME))
+                .serializeNulls()
+                .create();
     }
 
     public static KVServer getDefaultKVServer() throws IOException {

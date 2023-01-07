@@ -18,7 +18,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class HttpTaskServer {
     private static final int PORT = 8080;
     private static Gson gson;
-    static HttpServer httpServer;
+    public static HttpServer httpServer;
     private final TaskManager taskManager;
 
     public HttpTaskServer() throws IOException {
@@ -229,6 +229,7 @@ public class HttpTaskServer {
     }
 
     public void start() {
+        System.out.println(">>>");
         System.out.println("Запускаем сервер для HttpTaskServer на порту " + PORT);
         System.out.println("Открой в браузере http://localhost:" + PORT + "/");
         httpServer.start();

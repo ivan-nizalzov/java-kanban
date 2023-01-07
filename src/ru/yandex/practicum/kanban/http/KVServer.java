@@ -3,6 +3,7 @@ package ru.yandex.practicum.kanban.http;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,21 +33,28 @@ public class KVServer {
         try {
             System.out.println("\n/load");
             if (!hasAuth(h)) {
-                System.out.println("Запрос не авторизован. Необходим параметр в query API_TOKEN со значением API-key.");
+                System.out.println("Запрос неавторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
                 h.sendResponseHeaders(403, 0);
                 return;
             }
             if ("GET".equals(h.getRequestMethod())) {
                 String key = h.getRequestURI().getPath().substring("/load/".length());
                 if (key.isEmpty()) {
-                    System.out.println("Key для загрузки пустой. Key указывается в пути: /save/{key}");
+                    System.out.println("Key для загрузки пустой. Key указывается в пути: /load/{key}");
                     h.sendResponseHeaders(400, 0);
                     return;
                 }
-                sendText(h, data.get(key));
-            } else {
-                System.out.println("/load ждет GET-запрос, а получил: " + h.getRequestMethod());
-                h.sendResponseHeaders(405, 0);
+                String response = data.get(key);
+                if (response.isEmpty()) {
+                    System.out.println("Value для отправки пустой.");
+                    h.sendResponseHeaders(400, 0);
+                    return;
+                }
+                h.sendResponseHeaders(200, 0);
+
+                try (OutputStream os = h.getResponseBody()) {
+                    os.write(response.getBytes());
+                }
             }
         } finally {
             h.close();
@@ -101,10 +109,10 @@ public class KVServer {
     }
 
     public void start() {
+        System.out.println(">>>");
         System.out.println("Запускаем сервер KVServer на порту " + PORT);
         System.out.println("Открой в браузере http://localhost:" + PORT + "/");
         System.out.println("API_TOKEN: " + API_TOKEN);
-        System.out.println();
         server.start();
     }
 
@@ -131,5 +139,10 @@ public class KVServer {
         h.getResponseHeaders().add("Content-Type", "application/json");
         h.sendResponseHeaders(200, resp.length);
         h.getResponseBody().write(resp);
+    }
+
+    //Для проверки, что все таски сохраняются на сервере KVServer
+    public Map<String, String> getData() {
+        return data;
     }
 }
